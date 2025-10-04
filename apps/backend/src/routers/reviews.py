@@ -140,7 +140,7 @@ async def get_apple_reviews(
 @router.get("/trustpilot", response_model=ReviewsResponse)
 async def get_trustpilot_reviews(
     hours: int = Query(24, ge=1, le=168, description="Number of hours to look back"),
-    max_pages: int = Query(20, ge=1, le=50, description="Maximum number of pages to fetch"),
+    max_pages: int = Query(2, ge=1, le=50, description="Maximum number of pages to fetch"),
     cached: bool = Query(True, description="Whether to use cached data if available"),
     force_refresh: bool = Query(False, description="Force refresh data even if cache exists"),
 ) -> ReviewsResponse:

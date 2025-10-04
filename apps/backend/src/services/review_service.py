@@ -28,7 +28,7 @@ class ReviewService:
         source_filter: Optional[str] = None,
         cached: bool = True,
         force_refresh: bool = False,
-        max_pages: int = 20
+        max_pages: int = 1
     ) -> ReviewsResponse:
         """
         Get reviews with optional caching.
@@ -109,7 +109,7 @@ class ReviewService:
         hours: int = 24,
         cached: bool = True,
         force_refresh: bool = False,
-        max_pages: int = 20
+        max_pages: int = 1
     ) -> ReviewsResponse:
         """Get Google Play reviews with caching."""
         return await self.get_reviews(
@@ -125,7 +125,7 @@ class ReviewService:
         hours: int = 24,
         cached: bool = True,
         force_refresh: bool = False,
-        max_pages: int = 20
+        max_pages: int = 1
     ) -> ReviewsResponse:
         """Get App Store reviews with caching."""
         return await self.get_reviews(

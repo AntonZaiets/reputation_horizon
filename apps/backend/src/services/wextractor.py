@@ -25,13 +25,13 @@ class WextractorService:
         if not self.api_key:
             logger.warning("WEXTRACTOR_API_KEY not set in environment")
 
-    async def get_reviews(self, hours: int = 24, max_pages: int = 20) -> dict:
+    async def get_reviews(self, hours: int = 24, max_pages: int = 2) -> dict:
         """
         Fetch reviews from the last N hours.
 
         Args:
             hours: Number of hours to look back (default: 24)
-            max_pages: Maximum number of Trustpilot pages to fetch (default: 20)
+            max_pages: Maximum number of Trustpilot pages to fetch (default: 2)
 
         Returns:
             Dictionary containing reviews and statistics
