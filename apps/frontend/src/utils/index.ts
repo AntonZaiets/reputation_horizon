@@ -24,9 +24,10 @@ export const mapApiResponseToReviews = (data: { reviews: any[] }): Review[] => {
     thumbsUp: review.helpful_count || review.thumbsUp,
     version: review.app_version || review.version,
     platform: review.source === 'google' ? 'Google Play' : 
-              review.source === 'apple' ? 'App Store' : review.source,
+              review.source === 'apple' ? 'App Store' :
+              review.source === 'trustpilot' ? 'Trustpilot' : review.source,
     rating: review.rating,
-    source: review.source as 'google' | 'apple',
+    source: review.source as 'google' | 'apple' | 'trustpilot',
     date: new Date(review.date)
   }))
 }

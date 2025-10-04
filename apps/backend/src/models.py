@@ -44,7 +44,7 @@ class AppReview(BaseModel):
     title: str | None = Field(None, description="Review title")
     content: str = Field(..., description="Review text content")
     date: str = Field(..., description="Review date")
-    source: str = Field(..., description="Source platform (google/apple)")
+    source: str = Field(..., description="Source platform (google/apple/trustpilot)")
     helpful_count: int | None = Field(None, description="Number of helpful votes")
     app_version: str | None = Field(None, description="App version reviewed")
 
@@ -59,6 +59,7 @@ class ReviewStats(BaseModel):
     )
     google_reviews: int = Field(..., description="Number of Google Play reviews")
     apple_reviews: int = Field(..., description="Number of App Store reviews")
+    trustpilot_reviews: int = Field(..., description="Number of Trustpilot reviews")
 
 
 class ReviewsResponse(BaseModel):

@@ -40,6 +40,14 @@ export default function StatsCard({ stats }: StatsCardProps) {
         </div>
       </div>
 
+      <div className="stat-card trustpilot">
+        <div className="stat-icon">⭐</div>
+        <div className="stat-content">
+          <div className="stat-value">{stats.trustpilotReviews}</div>
+          <div className="stat-label">Trustpilot</div>
+        </div>
+      </div>
+
       <div className="stat-card positive">
         <div className="stat-icon">👍</div>
         <div className="stat-content">

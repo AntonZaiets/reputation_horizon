@@ -5,7 +5,7 @@ export interface Review {
   rating: number
   text: string
   date: Date
-  source: 'google' | 'apple'
+  source: 'google' | 'apple' | 'trustpilot'
   version?: string
   thumbsUp?: number
   platform?: string
@@ -16,12 +16,13 @@ export interface Stats {
   avgRating: number
   googlePlayReviews: number
   appStoreReviews: number
+  trustpilotReviews: number
   positiveReviews: number
   negativeReviews: number
 }
 
 // Типи для фільтрації та сортування
-export type FilterType = 'all' | 'google' | 'apple'
+export type FilterType = 'all' | 'google' | 'apple' | 'trustpilot'
 export type SortType = 'date' | 'rating'
 
 // Типи для API відповідей
