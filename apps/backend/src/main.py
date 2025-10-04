@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.config import settings
 from src.models import HealthResponse
-from src.routers import chat
+from src.routers import chat, reviews
 
 
 @asynccontextmanager
@@ -18,6 +18,7 @@ async def lifespan(app: FastAPI):
     print(f"   Environment: {settings.environment}")
     print(f"   LLM Provider: {settings.llm_provider}")
     print(f"   LLM Model: {settings.llm_model}")
+    print(f"   Wextractor API: {'✓ Configured' if settings.wextractor_api_key else '✗ Not configured'}")
 
     yield
 
@@ -27,7 +28,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Reputation Horizon API",
-    description="FastAPI backend with LangGraph for AI-powered interactions",
+    description="FastAPI backend with LangGraph for AI-powered interactions and app review monitoring",
     version="0.1.0",
     lifespan=lifespan,
 )
@@ -43,6 +44,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(chat.router)
+app.include_router(reviews.router)
 
 
 @app.get("/api/health", response_model=HealthResponse)
@@ -62,5 +64,10 @@ async def root():
         "message": "Welcome to Reputation Horizon API",
         "docs": "/docs",
         "health": "/api/health",
+        "endpoints": {
+            "chat": "/api/chat",
+            "reviews": "/api/reviews",
+            "google_reviews": "/api/reviews/google",
+            "apple_reviews": "/api/reviews/apple",
+        },
     }
-

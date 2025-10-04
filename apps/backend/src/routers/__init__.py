@@ -1,6 +1,5 @@
 """API routers."""
 
-from src.routers import chat
+from src.routers import chat, reviews
 
-__all__ = ["chat"]
-
+__all__ = ["chat", "reviews"]
