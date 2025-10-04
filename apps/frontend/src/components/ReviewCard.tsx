@@ -39,10 +39,10 @@ export default function ReviewCard({ review }: ReviewCardProps) {
       <div className="review-header">
         <div className="review-user">
           <div className="user-avatar">
-            {review.userName.charAt(0).toUpperCase()}
+            {(review.userName || 'A').charAt(0).toUpperCase()}
           </div>
           <div className="user-info">
-            <div className="user-name">{review.userName}</div>
+            <div className="user-name">{review.userName || 'Anonymous'}</div>
             <div className="review-meta">
               <span className="review-date">{formatDate(review.date)}</span>
               {review.version && (
@@ -54,8 +54,8 @@ export default function ReviewCard({ review }: ReviewCardProps) {
             </div>
           </div>
         </div>
-        <div className={`source-badge ${review.source}`}>
-          {review.source === 'google' ? (
+        <div className={`source-badge ${review.source || review.platform?.toLowerCase().replace(' ', '')}`}>
+          {review.platform === 'Google Play' || review.source === 'google' ? (
             <>
               <span className="source-icon">🤖</span>
               <span className="source-text">Google Play</span>

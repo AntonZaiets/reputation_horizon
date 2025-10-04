@@ -53,17 +53,31 @@ function App() {
 
       const data = await response.json()
       
-      // Конвертуємо дати з ISO string в Date об'єкти
+      // Конвертуємо дати з ISO string в Date об'єкти та мапимо поля
       const reviewsWithDates = data.reviews.map((review: any) => ({
         ...review,
+        userName: review.author || 'Anonymous', // Мапимо author -> userName
+        text: review.content || review.text || '', // Мапимо content -> text
+        thumbsUp: review.helpful_count || review.thumbsUp, // Мапимо helpful_count -> thumbsUp
+        version: review.app_version || review.version, // Мапимо app_version -> version
+        platform: review.source === 'google' ? 'Google Play' : review.source === 'apple' ? 'App Store' : review.source, // Мапимо source -> platform
         date: new Date(review.date)
       }))
 
       setReviews(reviewsWithDates)
       setFilteredReviews(reviewsWithDates)
-      setStats(data.stats)
+      
+      // Мапимо статистику з API формату на frontend формат
+      setStats({
+        totalReviews: data.stats?.total_reviews || 0,
+        avgRating: data.stats?.average_rating || 0,
+        googlePlayReviews: data.stats?.google_reviews || 0,
+        appStoreReviews: data.stats?.apple_reviews || 0,
+        positiveReviews: data.stats?.rating_distribution?.['5'] + data.stats?.rating_distribution?.['4'] || 0,
+        negativeReviews: data.stats?.rating_distribution?.['1'] + data.stats?.rating_distribution?.['2'] || 0,
+      })
 
-      console.log(`✅ Завантажено ${data.stats.totalReviews} реальних відгуків про Preply`)
+      console.log(`✅ Завантажено ${data.stats?.total_reviews || data.stats?.totalReviews || 0} реальних відгуків про Preply`)
       
     } catch (error) {
       console.error('❌ Помилка завантаження відгуків:', error)

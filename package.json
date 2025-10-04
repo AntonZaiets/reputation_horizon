@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" --names \"FRONT,BACK\" --prefix-colors \"cyan,magenta\"",
     "dev:frontend": "npm run dev --workspace=apps/frontend",
-    "dev:backend": "cd apps/backend && venv\\Scripts\\python.exe main.py",
+    "dev:backend": "cd apps/backend && source venv/bin/activate && python -m uvicorn src.main:app --reload --port 8000",
     "start": "npm run dev",
     "build": "npm run build --workspaces --if-present",
     "build:frontend": "npm run build --workspace=apps/frontend",
