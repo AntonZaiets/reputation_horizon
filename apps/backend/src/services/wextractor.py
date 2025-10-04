@@ -167,7 +167,6 @@ class WextractorService:
         Raises:
             httpx.HTTPError: If API request fails
         """
-        print("here fetch apple reviews")
         all_reviews = []
         seen_ids = set()  # Track unique review IDs to avoid duplicates
         
