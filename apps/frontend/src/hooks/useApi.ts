@@ -45,8 +45,8 @@ export const useApi = () => {
 export const useReviewsApi = () => {
   const { loading, error, executeRequest, clearError } = useApi()
 
-  const getReviews = useCallback(async (hours: number = 24) => {
-    return executeRequest(() => api.reviews.getReviews(hours))
+  const getReviews = useCallback(async (hours: number = 24, max_trustpilot_pages: number = 20) => {
+    return executeRequest(() => api.reviews.getReviews(hours, max_trustpilot_pages))
   }, [executeRequest])
 
   const getGoogleReviews = useCallback(async (hours: number = 24) => {
@@ -57,12 +57,17 @@ export const useReviewsApi = () => {
     return executeRequest(() => api.reviews.getAppleReviews(hours))
   }, [executeRequest])
 
+  const getTrustpilotReviews = useCallback(async (hours: number = 24, max_pages: number = 20) => {
+    return executeRequest(() => api.reviews.getTrustpilotReviews(hours, max_pages))
+  }, [executeRequest])
+
   return {
     loading,
     error,
     getReviews,
     getGoogleReviews,
     getAppleReviews,
+    getTrustpilotReviews,
     clearError
   }
 }

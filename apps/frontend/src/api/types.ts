@@ -13,7 +13,7 @@ export interface ApiReview {
   content: string
   rating: number
   date: string
-  source: 'google' | 'apple'
+  source: 'google' | 'apple' | 'trustpilot'
   helpful_count?: number
   app_version?: string
 }
@@ -24,6 +24,7 @@ export interface ApiStats {
   rating_distribution: Record<string, number>
   google_reviews: number
   apple_reviews: number
+  trustpilot_reviews: number
 }
 
 // Типи для відгуків (API формат)
@@ -100,6 +101,7 @@ export interface ReviewsParams {
   hours?: number
   country?: string
   limit?: number
+  max_trustpilot_pages?: number
 }
 
 export interface ReputationAnalysisParams {

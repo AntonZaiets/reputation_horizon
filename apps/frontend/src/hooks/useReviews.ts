@@ -24,10 +24,11 @@ export const useReviews = (): UseReviewsReturn => {
   const [stats, setStats] = useState<Stats>({
     totalReviews: 0,
     avgRating: 0,
-    googlePlayReviews: 0,
-    appStoreReviews: 0,
-    positiveReviews: 0,
-    negativeReviews: 0,
+      googlePlayReviews: 0,
+      appStoreReviews: 0,
+      trustpilotReviews: 0,
+      positiveReviews: 0,
+      negativeReviews: 0,
   })
   const [loadingState, setLoadingState] = useState<LoadingState>({
     isLoading: false,
@@ -40,7 +41,7 @@ export const useReviews = (): UseReviewsReturn => {
     setLoadingState({ isLoading: true, error: null })
     
     try {
-      const data = await api.reviews.getReviews(DEFAULT_SETTINGS.HOURS) as ReviewsApiResponse
+      const data = await api.reviews.getReviews(DEFAULT_SETTINGS.HOURS, 20) as ReviewsApiResponse
       
       // Мапимо відгуки
       const reviewsWithDates = mapApiResponseToReviews(data)
@@ -52,6 +53,7 @@ export const useReviews = (): UseReviewsReturn => {
         avgRating: data.stats?.average_rating || 0,
         googlePlayReviews: data.stats?.google_reviews || 0,
         appStoreReviews: data.stats?.apple_reviews || 0,
+        trustpilotReviews: data.stats?.trustpilot_reviews || 0,
         positiveReviews: (data.stats?.rating_distribution?.['5'] || 0) + 
                         (data.stats?.rating_distribution?.['4'] || 0),
         negativeReviews: (data.stats?.rating_distribution?.['1'] || 0) + 

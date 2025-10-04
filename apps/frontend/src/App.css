@@ -181,6 +181,10 @@
   background: linear-gradient(90deg, #000000 0%, #666666 100%);
 }
 
+.stat-card.trustpilot::before {
+  background: linear-gradient(90deg, #00b67a 0%, #00d98f 100%);
+}
+
 .stat-card.positive::before {
   background: linear-gradient(90deg, #34a853 0%, #66bb6a 100%);
 }
@@ -285,6 +289,11 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
+.filter-button.active.trustpilot {
+  background: linear-gradient(135deg, #00b67a 0%, #00d98f 100%);
+  box-shadow: 0 4px 15px rgba(0, 182, 122, 0.3);
+}
+
 /* Reviews Section */
 .reviews-section {
   background: white;
@@ -331,6 +340,10 @@
 
 .review-card.apple {
   border-left-color: #000000;
+}
+
+.review-card.trustpilot {
+  border-left-color: #00b67a;
 }
 
 .review-card:hover {
@@ -401,6 +414,11 @@
 .source-badge.apple {
   background: rgba(0, 0, 0, 0.1);
   color: #000;
+}
+
+.source-badge.trustpilot {
+  background: rgba(0, 182, 122, 0.1);
+  color: #00b67a;
 }
 
 .review-rating {

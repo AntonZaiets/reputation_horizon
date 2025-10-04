@@ -21,14 +21,18 @@ async def get_preply_reviews(
     hours: int = Query(
         24, ge=1, le=168, description="Number of hours to look back (max 7 days)"
     ),
+    max_trustpilot_pages: int = Query(
+        20, ge=1, le=50, description="Maximum number of Trustpilot pages to fetch (1-50, default: 20)"
+    ),
 ) -> ReviewsResponse:
     """
     Get Preply app reviews from the last N hours.
 
-    Fetches reviews from both Google Play and App Store using Wextractor API.
+    Fetches reviews from Google Play, App Store, and Trustpilot using Wextractor API.
 
     **Parameters:**
     - **hours**: Time range in hours (1-168, default: 24)
+    - **max_trustpilot_pages**: Maximum Trustpilot pages to fetch (1-50, default: 20)
 
     **Returns:**
     - List of reviews with statistics
@@ -40,7 +44,7 @@ async def get_preply_reviews(
     """
     try:
         logger.info(f"Fetching reviews for the last {hours} hours")
-        result = await wextractor_service.get_reviews(hours=hours)
+        result = await wextractor_service.get_reviews(hours=hours, max_trustpilot_pages=max_trustpilot_pages)
         logger.info(f"Returning {len(result['reviews'])} reviews from the last {hours} hours")
         return ReviewsResponse(**result)
 
@@ -129,4 +133,35 @@ async def get_apple_reviews(
         raise HTTPException(status_code=e.response.status_code, detail=str(e))
     except Exception as e:
         logger.error(f"Error fetching Apple reviews: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/trustpilot", response_model=ReviewsResponse)
+async def get_trustpilot_reviews(
+    hours: int = Query(24, ge=1, le=168, description="Number of hours to look back"),
+    max_pages: int = Query(20, ge=1, le=50, description="Maximum number of pages to fetch"),
+) -> ReviewsResponse:
+    """
+    Get only Trustpilot reviews.
+
+    **Future enhancement:** Can be optimized to call only Trustpilot API.
+    """
+    try:
+        result = await wextractor_service.get_reviews(hours=hours, max_trustpilot_pages=max_pages)
+
+        # Filter only Trustpilot reviews
+        trustpilot_reviews = [r for r in result["reviews"] if r.source == "trustpilot"]
+
+        result["reviews"] = trustpilot_reviews
+        result["stats"].google_reviews = 0
+        result["stats"].apple_reviews = 0
+        result["stats"].total_reviews = len(trustpilot_reviews)
+
+        return ReviewsResponse(**result)
+
+    except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP error: {e}")
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error fetching Trustpilot reviews: {e}")
         raise HTTPException(status_code=500, detail=str(e))

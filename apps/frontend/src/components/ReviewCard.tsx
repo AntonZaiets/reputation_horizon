@@ -34,10 +34,15 @@ export default function ReviewCard({ review }: ReviewCardProps) {
               <span className="source-icon">🤖</span>
               <span className="source-text">Google Play</span>
             </>
-          ) : (
+          ) : review.platform === 'App Store' || review.source === 'apple' ? (
             <>
               <span className="source-icon">🍎</span>
               <span className="source-text">App Store</span>
+            </>
+          ) : (
+            <>
+              <span className="source-icon">⭐</span>
+              <span className="source-text">Trustpilot</span>
             </>
           )}
         </div>

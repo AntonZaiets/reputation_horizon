@@ -32,6 +32,12 @@ export default function FilterBar({ filter, setFilter, sortBy, setSortBy }: Filt
           >
             <span>🍎</span> App Store
           </button>
+          <button
+            className={`filter-button ${filter === 'trustpilot' ? 'active trustpilot' : ''}`}
+            onClick={() => setFilter('trustpilot')}
+          >
+            <span>⭐</span> Trustpilot
+          </button>
         </div>
       </div>
 

@@ -88,8 +88,8 @@ const apiClient = new ApiClient(API_BASE_URL)
 // API функції для різних ендпоінтів
 export const reviewsApi = {
   // Отримати відгуки
-  getReviews: async (hours: number = 24): Promise<ReviewsApiResponse> => {
-    return apiClient.get<ReviewsApiResponse>(API_ENDPOINTS.REVIEWS, { hours })
+  getReviews: async (hours: number = 24, max_trustpilot_pages: number = 20): Promise<ReviewsApiResponse> => {
+    return apiClient.get<ReviewsApiResponse>(API_ENDPOINTS.REVIEWS, { hours, max_trustpilot_pages })
   },
 
   // Отримати відгуки з Google Play
@@ -100,6 +100,11 @@ export const reviewsApi = {
   // Отримати відгуки з App Store
   getAppleReviews: async (hours: number = 24): Promise<ReviewsApiResponse> => {
     return apiClient.get<ReviewsApiResponse>(`${API_ENDPOINTS.REVIEWS}/apple`, { hours })
+  },
+
+  // Отримати відгуки з Trustpilot
+  getTrustpilotReviews: async (hours: number = 24, max_pages: number = 20): Promise<ReviewsApiResponse> => {
+    return apiClient.get<ReviewsApiResponse>(`${API_ENDPOINTS.REVIEWS}/trustpilot`, { hours, max_pages })
   },
 }
 
