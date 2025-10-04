@@ -19,6 +19,7 @@ async def lifespan(app: FastAPI):
     print(f"   LLM Provider: {settings.llm_provider}")
     print(f"   LLM Model: {settings.llm_model}")
     print(f"   Wextractor API: {'✓ Configured' if settings.wextractor_api_key else '✗ Not configured'}")
+    print(f"   DuckDB Cache: ✓ Enabled (data/reviews_cache.db)")
 
     yield
 
@@ -70,6 +71,8 @@ async def root():
             "reviews": "/api/reviews",
             "google_reviews": "/api/reviews/google",
             "apple_reviews": "/api/reviews/apple",
+            "cache_stats": "/api/reviews/cache/stats",
+            "clear_cache": "/api/reviews/cache",
             "reputation_analysis": "/api/reputation/analyze",
             "reputation_summary": "/api/reputation/summary",
         },

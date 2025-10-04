@@ -113,6 +113,10 @@
 .analysis-toggle {
   margin: 20px 0;
   text-align: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .toggle-button {

@@ -35,6 +35,34 @@ class OpenAIService:
         else:
             self.client = AsyncOpenAI(api_key=self.api_key)
 
+    async def get_completion(self, prompt: str) -> str:
+        """
+        Get a completion from OpenAI for a given prompt.
+        
+        Args:
+            prompt: The prompt to send to OpenAI
+            
+        Returns:
+            str: The completion text from OpenAI
+        """
+        if not self.client:
+            return "OpenAI client not initialized. Please configure OPENAI_API_KEY."
+
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are an expert reputation analyst. Provide detailed, objective analysis."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            logger.error(f"Error getting completion from OpenAI: {e}")
+            return f"Error: {str(e)}"
+
     async def analyze_review(self, review: AppReview) -> ReputationInsight:
         """
         Analyze a single review using OpenAI.
