@@ -10,13 +10,16 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" --names \"FRONT,BACK\" --prefix-colors \"cyan,magenta\"",
     "dev:frontend": "npm run dev --workspace=apps/frontend",
-    "dev:backend": "cd apps/backend && venv\\Scripts\\python.exe main.py",
+    "dev:backend": "cd apps/backend && uv run uvicorn src.main:app --reload --port 8000",
     "start": "npm run dev",
     "build": "npm run build --workspaces --if-present",
     "build:frontend": "npm run build --workspace=apps/frontend",
     "lint": "npm run lint --workspaces --if-present",
     "clean": "rimraf apps/*/node_modules apps/*/dist node_modules",
-    "install:all": "npm install"
+    "install:all": "npm install",
+    "backend:setup": "cd apps/backend && ./setup.sh",
+    "backend:run": "cd apps/backend && ./run.sh",
+    "backend:prod": "cd apps/backend && uv run uvicorn src.main:app --host 0.0.0.0 --port 8000"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
