@@ -19,6 +19,12 @@ const ReviewCard = memo(function ReviewCard({ review }: ReviewCardProps) {
     return '⭐'
   }
 
+  const handleTranslate = () => {
+    const text = encodeURIComponent(review.text)
+    const translateUrl = `https://translate.google.com/?sl=auto&tl=en&text=${text}`
+    window.open(translateUrl, '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <article className={`review-card ${review.source}`} role="article" aria-labelledby={`review-${review.id}`}>
       <header className="review-header">
@@ -62,6 +68,18 @@ const ReviewCard = memo(function ReviewCard({ review }: ReviewCardProps) {
 
       <div className="review-text">
         {review.text}
+      </div>
+
+      <div className="review-actions">
+        <button 
+          className="translate-button"
+          onClick={handleTranslate}
+          aria-label="Translate to English"
+          title="Translate to English"
+        >
+          <span className="translate-icon" aria-hidden="true">🌐</span>
+          Translate
+        </button>
       </div>
 
       {review.thumbsUp !== undefined && (
