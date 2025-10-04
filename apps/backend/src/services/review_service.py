@@ -27,7 +27,8 @@ class ReviewService:
         hours: int = 24,
         source_filter: Optional[str] = None,
         cached: bool = True,
-        force_refresh: bool = False
+        force_refresh: bool = False,
+        max_pages: int = 20
     ) -> ReviewsResponse:
         """
         Get reviews with optional caching.
@@ -37,6 +38,7 @@ class ReviewService:
             source_filter: Optional source filter ('google' or 'apple')
             cached: Whether to use cached data (default: True)
             force_refresh: Force refresh even if cache exists
+            max_pages: Maximum number of Trustpilot pages to fetch
             
         Returns:
             ReviewsResponse with reviews and statistics
@@ -56,7 +58,7 @@ class ReviewService:
 
             # Fetch fresh data from Wextractor
             logger.info(f"Fetching fresh reviews for {hours} hours from Wextractor API")
-            fresh_response = await self.wextractor_service.get_reviews(hours=hours)
+            fresh_response = await self.wextractor_service.get_reviews(hours=hours, max_pages=max_pages)
             
             # Apply source filter if specified
             if source_filter:
@@ -102,28 +104,32 @@ class ReviewService:
         self,
         hours: int = 24,
         cached: bool = True,
-        force_refresh: bool = False
+        force_refresh: bool = False,
+        max_pages: int = 20
     ) -> ReviewsResponse:
         """Get Google Play reviews with caching."""
         return await self.get_reviews(
             hours=hours,
             source_filter="google",
             cached=cached,
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            max_pages=max_pages
         )
 
     async def get_apple_reviews(
         self,
         hours: int = 24,
         cached: bool = True,
-        force_refresh: bool = False
+        force_refresh: bool = False,
+        max_pages: int = 20
     ) -> ReviewsResponse:
         """Get App Store reviews with caching."""
         return await self.get_reviews(
             hours=hours,
             source_filter="apple",
             cached=cached,
-            force_refresh=force_refresh
+            force_refresh=force_refresh,
+            max_pages=max_pages
         )
 
     def get_cache_stats(self) -> dict:

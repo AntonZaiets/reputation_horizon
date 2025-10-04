@@ -24,7 +24,7 @@ async def get_preply_reviews(
     ),
     cached: bool = Query(True, description="Whether to use cached data if available"),
     force_refresh: bool = Query(False, description="Force refresh data even if cache exists"),
-    max_trustpilot_pages: int = Query(
+    max_pages: int = Query(
         20, ge=1, le=50, description="Maximum number of Trustpilot pages to fetch (1-50, default: 20)"
     ),
 ) -> ReviewsResponse:
@@ -38,7 +38,7 @@ async def get_preply_reviews(
     - **hours**: Time range in hours (1–168, default: 24)
     - **cached**: Use cached data if available (default: True)
     - **force_refresh**: Force refresh even if cache exists (default: False)
-    - **max_trustpilot_pages**: Number of Trustpilot pages to fetch (1–50)
+    - **max_pages**: Number of Trustpilot pages to fetch (1–50)
 
     **Returns:**
     - List of reviews with statistics
@@ -47,14 +47,14 @@ async def get_preply_reviews(
     try:
         logger.info(
             f"Fetching reviews for the last {hours} hours "
-            f"(cached={cached}, force_refresh={force_refresh}, trustpilot_pages={max_trustpilot_pages})"
+            f"(cached={cached}, force_refresh={force_refresh}, trustpilot_pages={max_pages})"
         )
 
         result = await review_service.get_reviews(
             hours=hours,
             cached=cached,
             force_refresh=force_refresh,
-            max_trustpilot_pages=max_trustpilot_pages,
+            max_pages=max_pages,
         )
 
         return result
