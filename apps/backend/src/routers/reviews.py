@@ -2,6 +2,7 @@
 
 import logging
 
+import httpx
 from fastapi import APIRouter, HTTPException, Query
 
 from src.models import ReviewsResponse
@@ -32,23 +33,44 @@ async def get_preply_reviews(
     **Returns:**
     - List of reviews with statistics
 
-    **Note:** This endpoint currently uses mock data for development.
-    Update the API endpoints in `src/services/wextractor.py` once you have
-    the actual Wextractor API documentation.
+    **Errors:**
+    - 500: API configuration error or request failed
+    - 404: Wextractor API endpoint not found
+    - 401: Invalid API key
     """
     try:
         logger.info(f"Fetching reviews for the last {hours} hours")
-
         result = await wextractor_service.get_reviews(hours=hours)
-
         return ReviewsResponse(**result)
 
     except ValueError as e:
         logger.error(f"Configuration error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=500,
+            detail=f"Configuration error: {str(e)}. Check WEXTRACTOR_API_KEY in .env file.",
+        )
+    except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP error from Wextractor API: {e}")
+        status_code = e.response.status_code
+        detail = f"Wextractor API error ({status_code}): {e.response.text}"
+
+        if status_code == 404:
+            detail = (
+                "Wextractor API endpoint not found. "
+                "Please verify the API URL and endpoint in src/services/wextractor.py"
+            )
+        elif status_code == 401:
+            detail = "Invalid Wextractor API key. Check WEXTRACTOR_API_KEY in .env file."
+
+        raise HTTPException(status_code=status_code, detail=detail)
+    except httpx.RequestError as e:
+        logger.error(f"Request error: {e}")
+        raise HTTPException(
+            status_code=503, detail=f"Failed to connect to Wextractor API: {str(e)}"
+        )
     except Exception as e:
-        logger.error(f"Error fetching reviews: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch reviews: {str(e)}")
+        logger.error(f"Unexpected error fetching reviews: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
 
 @router.get("/google", response_model=ReviewsResponse)
@@ -58,8 +80,7 @@ async def get_google_reviews(
     """
     Get only Google Play reviews.
 
-    **Future enhancement:** Currently returns all reviews but filtered by source.
-    Can be optimized to call only Google Play API.
+    **Future enhancement:** Can be optimized to call only Google Play API.
     """
     try:
         result = await wextractor_service.get_reviews(hours=hours)
@@ -73,6 +94,9 @@ async def get_google_reviews(
 
         return ReviewsResponse(**result)
 
+    except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP error: {e}")
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
     except Exception as e:
         logger.error(f"Error fetching Google reviews: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -85,8 +109,7 @@ async def get_apple_reviews(
     """
     Get only App Store reviews.
 
-    **Future enhancement:** Currently returns all reviews but filtered by source.
-    Can be optimized to call only App Store API.
+    **Future enhancement:** Can be optimized to call only App Store API.
     """
     try:
         result = await wextractor_service.get_reviews(hours=hours)
@@ -100,7 +123,9 @@ async def get_apple_reviews(
 
         return ReviewsResponse(**result)
 
+    except httpx.HTTPStatusError as e:
+        logger.error(f"HTTP error: {e}")
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
     except Exception as e:
         logger.error(f"Error fetching Apple reviews: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-

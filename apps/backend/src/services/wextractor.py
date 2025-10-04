@@ -2,6 +2,7 @@
 
 import logging
 from datetime import datetime, timedelta
+from time import sleep
 
 import httpx
 
@@ -32,7 +33,12 @@ class WextractorService:
 
         Returns:
             Dictionary containing reviews and statistics
+
+        Raises:
+            ValueError: If API key is not configured
+            httpx.HTTPError: If API request fails
         """
+
         if not self.api_key:
             raise ValueError("WEXTRACTOR_API_KEY not configured")
 
@@ -63,99 +69,96 @@ class WextractorService:
         """
         Fetch Google Play reviews.
 
-        Note: This is a template. Adjust the endpoint and parameters
-        based on actual Wextractor API documentation.
+        Update the endpoint URL and parameters based on actual Wextractor API documentation.
+
+        Raises:
+            httpx.HTTPError: If API request fails
         """
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                # TODO: Update this endpoint based on actual Wextractor API docs
-                # Common patterns:
-                # - /api/v1/reviews/google
-                # - /api/reviews?platform=google&app_id={app_id}
-                url = f"{self.api_url}/reviews/google"
+        async with httpx.AsyncClient(timeout=30.0) as client:
 
-                headers = {
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json",
-                }
+            url = f"{self.api_url}/api/v1/reviews/googleplay"
 
-                params = {
-                    "app_id": self.google_app_id,
-                    "hours": hours,
-                    "limit": 100,  # Adjust as needed
-                }
+            params = {
+                "id": self.google_app_id,
+                "auth_token": self.api_key,
+                "offset": 0,
+            }
 
-                logger.info(f"Fetching Google Play reviews from {url}")
-                response = await client.get(url, headers=headers, params=params)
+            logger.info(f"Fetching Google Play reviews from {url}")
+            logger.debug(f"Request params: {params}")
 
-                if response.status_code == 404:
-                    logger.warning(
-                        "Wextractor API endpoint not found. Using mock data. "
-                        "Update the API endpoint in src/services/wextractor.py"
-                    )
-                    return self._generate_mock_google_reviews()
+            response = await client.get(url, params=params)
 
-                response.raise_for_status()
-                data = response.json()
+            # Log response details for debugging
+            logger.info(f"Response status: {response.status_code}")
+            if response.status_code != 200:
+                logger.error(f"Response body: {response.text}")
 
-                # Parse response - adjust based on actual API response format
-                return self._parse_google_reviews(data)
+            response.raise_for_status()
+            data = response.json()
 
-        except httpx.HTTPError as e:
-            logger.error(f"Error fetching Google Play reviews: {e}")
-            # Return mock data for development
-            return self._generate_mock_google_reviews()
+            # Parse response - adjust based on actual API response format
+            return self._parse_google_reviews(data)
 
     async def _fetch_apple_reviews(self, hours: int) -> list[AppReview]:
         """
         Fetch App Store reviews.
 
-        Note: This is a template. Adjust the endpoint and parameters
-        based on actual Wextractor API documentation.
+        Update the endpoint URL and parameters based on actual Wextractor API documentation.
+
+        Raises:
+            httpx.HTTPError: If API request fails
         """
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                # TODO: Update this endpoint based on actual Wextractor API docs
-                url = f"{self.api_url}/reviews/apple"
+        print("here fetch apple reviews")
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            url = f"{self.api_url}/api/v1/reviews/appstore?"
 
-                headers = {
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json",
-                }
+            params = {
+                "id": self.apple_app_id,
+                "auth_token": self.api_key,
+                "offset": 0,
+            }
 
-                params = {
-                    "app_id": self.apple_app_id,
-                    "hours": hours,
-                    "limit": 100,
-                }
+            logger.info(f"Fetching App Store reviews from {url}")
+            logger.debug(f"Request params: {params}")
 
-                logger.info(f"Fetching App Store reviews from {url}")
-                response = await client.get(url, headers=headers, params=params)
+            response = await client.get(url, params=params)
 
-                if response.status_code == 404:
-                    logger.warning(
-                        "Wextractor API endpoint not found. Using mock data. "
-                        "Update the API endpoint in src/services/wextractor.py"
-                    )
-                    return self._generate_mock_apple_reviews()
+            # Log response details for debugging
+            logger.info(f"Response status: {response.status_code}")
+            if response.status_code != 200:
+                logger.error(f"Response body: {response.text}")
 
-                response.raise_for_status()
-                data = response.json()
+            response.raise_for_status()
+            data = response.json()
 
-                return self._parse_apple_reviews(data)
-
-        except httpx.HTTPError as e:
-            logger.error(f"Error fetching App Store reviews: {e}")
-            return self._generate_mock_apple_reviews()
+            return self._parse_apple_reviews(data)
 
     def _parse_google_reviews(self, data: dict) -> list[AppReview]:
         """
         Parse Google Play reviews from API response.
 
-        TODO: Adjust this based on actual Wextractor API response format.
+        Adjust this based on actual Wextractor API response format.
+        Expected format:
+        {
+            "reviews": [
+                {
+                    "id": "...",
+                    "author": "...",
+                    "rating": 5,
+                    "title": "...",
+                    "content": "...",
+                    "date": "...",
+                    "helpful_count": 10,
+                    "app_version": "1.0.0"
+                }
+            ]
+        }
         """
         reviews = []
         raw_reviews = data.get("reviews", [])
+
+        logger.info(f"Parsing {len(raw_reviews)} Google Play reviews")
 
         for review in raw_reviews:
             try:
@@ -174,14 +177,21 @@ class WextractorService:
                 )
             except Exception as e:
                 logger.warning(f"Failed to parse review: {e}")
+                logger.debug(f"Review data: {review}")
                 continue
 
         return reviews
 
     def _parse_apple_reviews(self, data: dict) -> list[AppReview]:
-        """Parse App Store reviews from API response."""
+        """
+        Parse App Store reviews from API response.
+
+        Adjust this based on actual Wextractor API response format.
+        """
         reviews = []
         raw_reviews = data.get("reviews", [])
+
+        logger.info(f"Parsing {len(raw_reviews)} App Store reviews")
 
         for review in raw_reviews:
             try:
@@ -200,6 +210,7 @@ class WextractorService:
                 )
             except Exception as e:
                 logger.warning(f"Failed to parse review: {e}")
+                logger.debug(f"Review data: {review}")
                 continue
 
         return reviews
@@ -234,59 +245,3 @@ class WextractorService:
             google_reviews=google_count,
             apple_reviews=apple_count,
         )
-
-    # Mock data methods for development/testing
-    def _generate_mock_google_reviews(self) -> list[AppReview]:
-        """Generate mock Google Play reviews for testing."""
-        return [
-            AppReview(
-                id="google_1",
-                author="John Doe",
-                rating=5,
-                title="Excellent app!",
-                content="Great for learning languages. Highly recommend!",
-                date=(datetime.now() - timedelta(hours=2)).isoformat(),
-                source="google",
-                helpful_count=15,
-                app_version="1.2.3",
-            ),
-            AppReview(
-                id="google_2",
-                author="Jane Smith",
-                rating=4,
-                title="Good but could be better",
-                content="Nice app, but sometimes has connection issues.",
-                date=(datetime.now() - timedelta(hours=5)).isoformat(),
-                source="google",
-                helpful_count=8,
-                app_version="1.2.3",
-            ),
-        ]
-
-    def _generate_mock_apple_reviews(self) -> list[AppReview]:
-        """Generate mock App Store reviews for testing."""
-        return [
-            AppReview(
-                id="apple_1",
-                author="User123",
-                rating=5,
-                title="Love it!",
-                content="Perfect for language learning. Worth every penny.",
-                date=(datetime.now() - timedelta(hours=1)).isoformat(),
-                source="apple",
-                helpful_count=22,
-                app_version="1.2.3",
-            ),
-            AppReview(
-                id="apple_2",
-                author="LangLearner",
-                rating=3,
-                title="Okay",
-                content="It works but the UI could be improved.",
-                date=(datetime.now() - timedelta(hours=4)).isoformat(),
-                source="apple",
-                helpful_count=5,
-                app_version="1.2.2",
-            ),
-        ]
-

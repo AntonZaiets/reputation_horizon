@@ -1,8 +1,12 @@
-"""Application configuration using pydantic-settings."""
+from pathlib import Path
 
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Load .env file explicitly
+env_path = Path(__file__).parent.parent.parent.parent / ".env"
 
+load_dotenv(dotenv_path=env_path)
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
@@ -23,12 +27,12 @@ class Settings(BaseSettings):
 
     # Wextractor API Configuration
     wextractor_api_key: str | None = None
-    wextractor_api_url: str = "https://api.wextractor.com"
-    preply_app_id_google: str = "com.preply.android"
-    preply_app_id_apple: str = "1400521332"
+    wextractor_api_url: str = "https://wextractor.com"
+    preply_app_id_google: str = "com.preply"
+    preply_app_id_apple: str = "1352790442"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file="../../.env",
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
