@@ -8,17 +8,18 @@
     "apps/backend"
   ],
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\" --names \"FRONT,BACK\" --prefix-colors \"cyan,magenta\"",
     "dev:frontend": "npm run dev --workspace=apps/frontend",
-    "dev:backend": "npm run dev --workspace=apps/backend",
+    "dev:backend": "cd apps/backend && venv\\Scripts\\python.exe main.py",
+    "start": "npm run dev",
     "build": "npm run build --workspaces --if-present",
     "build:frontend": "npm run build --workspace=apps/frontend",
-    "build:backend": "npm run build --workspace=apps/backend",
     "lint": "npm run lint --workspaces --if-present",
     "clean": "rimraf apps/*/node_modules apps/*/dist node_modules",
     "install:all": "npm install"
   },
   "devDependencies": {
+    "concurrently": "^9.2.1",
     "rimraf": "^6.0.1"
   },
   "engines": {
@@ -26,4 +27,3 @@
     "npm": ">=9.0.0"
   }
 }
-
