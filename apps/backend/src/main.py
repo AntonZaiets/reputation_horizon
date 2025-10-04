@@ -1,5 +1,6 @@
 """FastAPI application entry point."""
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -9,22 +10,33 @@ from src.config import settings
 from src.models import HealthResponse
 from src.routers import chat, reviews, reputation
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler(),  # Console output
+    ]
+)
+
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup/shutdown events."""
     # Startup
-    print(f"🚀 Starting Reputation Horizon Backend")
-    print(f"   Environment: {settings.environment}")
-    print(f"   LLM Provider: {settings.llm_provider}")
-    print(f"   LLM Model: {settings.llm_model}")
-    print(f"   Wextractor API: {'✓ Configured' if settings.wextractor_api_key else '✗ Not configured'}")
-    print(f"   DuckDB Cache: ✓ Enabled (data/reviews_cache.db)")
+    logger.info("🚀 Starting Reputation Horizon Backend")
+    logger.info(f"   Environment: {settings.environment}")
+    logger.info(f"   LLM Provider: {settings.llm_provider}")
+    logger.info(f"   LLM Model: {settings.llm_model}")
+    logger.info(f"   Wextractor API: {'✓ Configured' if settings.wextractor_api_key else '✗ Not configured'}")
+    logger.info("   DuckDB Cache: ✓ Enabled (data/reviews_cache.db)")
 
     yield
 
     # Shutdown
-    print("👋 Shutting down Reputation Horizon Backend")
+    logger.info("👋 Shutting down Reputation Horizon Backend")
 
 
 app = FastAPI(

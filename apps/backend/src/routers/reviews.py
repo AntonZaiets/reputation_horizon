@@ -24,7 +24,7 @@ async def get_preply_reviews(
     ),
     cached: bool = Query(True, description="Whether to use cached data if available"),
     force_refresh: bool = Query(False, description="Force refresh data even if cache exists"),
-    max_trustpilot_pages: int = Query(
+    max_pages: int = Query(
         20, ge=1, le=50, description="Maximum number of Trustpilot pages to fetch (1-50, default: 20)"
     ),
 ) -> ReviewsResponse:
@@ -38,7 +38,7 @@ async def get_preply_reviews(
     - **hours**: Time range in hours (1–168, default: 24)
     - **cached**: Use cached data if available (default: True)
     - **force_refresh**: Force refresh even if cache exists (default: False)
-    - **max_trustpilot_pages**: Number of Trustpilot pages to fetch (1–50)
+    - **max_pages**: Number of Trustpilot pages to fetch (1–50)
 
     **Returns:**
     - List of reviews with statistics
@@ -47,14 +47,14 @@ async def get_preply_reviews(
     try:
         logger.info(
             f"Fetching reviews for the last {hours} hours "
-            f"(cached={cached}, force_refresh={force_refresh}, trustpilot_pages={max_trustpilot_pages})"
+            f"(cached={cached}, force_refresh={force_refresh}, trustpilot_pages={max_pages})"
         )
 
         result = await review_service.get_reviews(
             hours=hours,
             cached=cached,
             force_refresh=force_refresh,
-            max_trustpilot_pages=max_trustpilot_pages,
+            max_pages=max_pages,
         )
 
         return result
@@ -140,7 +140,7 @@ async def get_apple_reviews(
 @router.get("/trustpilot", response_model=ReviewsResponse)
 async def get_trustpilot_reviews(
     hours: int = Query(24, ge=1, le=168, description="Number of hours to look back"),
-    max_pages: int = Query(20, ge=1, le=50, description="Maximum number of pages to fetch"),
+    max_pages: int = Query(2, ge=1, le=50, description="Maximum number of pages to fetch"),
     cached: bool = Query(True, description="Whether to use cached data if available"),
     force_refresh: bool = Query(False, description="Force refresh data even if cache exists"),
 ) -> ReviewsResponse:
@@ -170,6 +170,10 @@ async def get_cache_stats():
     """Get cache statistics."""
     try:
         stats = review_service.get_cache_stats()
+        
+        # Also show cache contents for debugging
+        review_service.cache_service.debug_cache_contents()
+        
         return {
             "cache_stats": stats,
             "message": "Cache statistics retrieved successfully",
@@ -204,4 +208,45 @@ async def cleanup_expired_cache():
         return {"message": "Expired cache entries cleaned up successfully"}
     except Exception as e:
         logger.error(f"Error cleaning up cache: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/cache/test")
+async def test_cache(hours: int = Query(24, description="Hours to test cache for")):
+    """
+    Test cache functionality.
+    
+    This endpoint will:
+    1. Try to get cached data
+    2. Show cache status
+    3. Not make external API calls if cache exists
+    """
+    try:
+        logger.info(f"🧪 Testing cache for {hours} hours")
+        
+        # Try to get cached data
+        cached_response = review_service.cache_service.get_cached_reviews(
+            hours=hours,
+            max_age_hours=24
+        )
+        
+        if cached_response:
+            logger.info(f"✅ Cache test PASSED: Found {len(cached_response.reviews)} cached reviews")
+            return {
+                "status": "cache_hit",
+                "reviews_count": len(cached_response.reviews),
+                "cached": True,
+                "message": f"Cache working! Found {len(cached_response.reviews)} reviews"
+            }
+        else:
+            logger.info(f"❌ Cache test FAILED: No cached data found")
+            return {
+                "status": "cache_miss", 
+                "reviews_count": 0,
+                "cached": False,
+                "message": "No cached data found"
+            }
+            
+    except Exception as e:
+        logger.error(f"Error testing cache: {e}")
         raise HTTPException(status_code=500, detail=str(e))
