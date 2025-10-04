@@ -21,9 +21,15 @@ class CacheService:
         self.db_path = Path(db_path)
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # Initialize database connection
-        self.conn = duckdb.connect(str(self.db_path))
-        self._create_tables()
+        # Initialize database connection with error handling
+        self.conn = None
+        try:
+            self.conn = duckdb.connect(str(self.db_path))
+            self._create_tables()
+            logger.info(f"DuckDB cache initialized at {self.db_path}")
+        except Exception as e:
+            logger.warning(f"Failed to initialize DuckDB cache: {e}. Cache will be disabled.")
+            self.conn = None
 
     def _create_tables(self) -> None:
         """Create necessary tables if they don't exist."""
@@ -79,25 +85,39 @@ class CacheService:
         WHERE cache_key = ? AND expires_at > CURRENT_TIMESTAMP
         """
         result = self.conn.execute(query, [cache_key]).fetchone()
-        return result is not None
+        
+        if result:
+            logger.debug(f"Cache hit for key: {cache_key}, expires at: {result[0]}")
+            return True
+        else:
+            logger.debug(f"Cache miss for key: {cache_key} (expired or not found)")
+            return False
 
     def _cleanup_expired_cache(self) -> None:
         """Remove expired cache entries."""
-        cleanup_query = """
-        DELETE FROM cache_metadata WHERE expires_at <= CURRENT_TIMESTAMP
-        """
-        self.conn.execute(cleanup_query)
-        
-        # Also clean up orphaned reviews (not referenced by any cache entry)
-        orphan_cleanup = """
-        DELETE FROM reviews 
-        WHERE id NOT IN (
-            SELECT DISTINCT r.id 
-            FROM reviews r 
-            JOIN cache_metadata c ON r.cached_at >= c.cached_at - INTERVAL '1 hour'
-        )
-        """
-        self.conn.execute(orphan_cleanup)
+        if not self.conn:
+            logger.debug("DuckDB cache not available, cannot cleanup cache")
+            return
+            
+        try:
+            cleanup_query = """
+            DELETE FROM cache_metadata WHERE expires_at <= CURRENT_TIMESTAMP
+            """
+            self.conn.execute(cleanup_query)
+            
+            # Also clean up orphaned reviews (not referenced by any cache entry)
+            orphan_cleanup = """
+            DELETE FROM reviews 
+            WHERE id NOT IN (
+                SELECT DISTINCT r.id 
+                FROM reviews r 
+                JOIN cache_metadata c ON r.cached_at >= c.cached_at - INTERVAL '1 hour'
+            )
+            """
+            self.conn.execute(orphan_cleanup)
+            
+        except Exception as e:
+            logger.error(f"Error during cache cleanup: {e}")
 
     def get_cached_reviews(
         self, 
@@ -116,13 +136,20 @@ class CacheService:
         Returns:
             Cached ReviewsResponse or None if not available/valid
         """
+        if not self.conn:
+            logger.debug("DuckDB cache not available, skipping cache lookup")
+            return None
+            
         try:
             cache_key = self._generate_cache_key(hours, source_filter)
+            logger.info(f"🔍 Looking up cache for key: {cache_key}")
             
             # Check if cache is valid
             if not self._is_cache_valid(cache_key, max_age_hours):
-                logger.debug(f"Cache miss for key: {cache_key}")
+                logger.info(f"❌ Cache validation failed for key: {cache_key}")
                 return None
+            
+            logger.info(f"✅ Cache validation passed for key: {cache_key}")
 
             # Get cache metadata
             metadata_query = """
@@ -133,7 +160,10 @@ class CacheService:
             metadata = self.conn.execute(metadata_query, [cache_key]).fetchone()
             
             if not metadata:
+                logger.info(f"❌ No metadata found for cache key: {cache_key}")
                 return None
+
+            logger.info(f"📊 Found metadata for cache key: {cache_key}")
 
             # Get reviews
             reviews_query = """
@@ -153,7 +183,10 @@ class CacheService:
             reviews_data = self.conn.execute(reviews_query, [cache_key]).fetchall()
             
             if not reviews_data:
+                logger.info(f"❌ No reviews found for cache key: {cache_key}")
                 return None
+            
+            logger.info(f"📝 Found {len(reviews_data)} reviews for cache key: {cache_key}")
 
             # Convert to AppReview objects
             reviews = []
@@ -181,13 +214,16 @@ class CacheService:
 
             logger.info(f"Cache hit for key: {cache_key}, {len(reviews)} reviews")
             
-            return ReviewsResponse(
+            response = ReviewsResponse(
                 reviews=reviews,
                 stats=stats,
                 fetched_at=metadata[5].isoformat(),
                 time_range_hours=hours,
                 cached=True
             )
+            
+            logger.debug(f"Returning cached response with {len(response.reviews)} reviews")
+            return response
 
         except Exception as e:
             logger.error(f"Error retrieving cached reviews: {e}")
@@ -209,9 +245,15 @@ class CacheService:
             source_filter: Optional source filter
             cache_duration_hours: How long to keep the cache
         """
+        if not self.conn:
+            logger.debug("DuckDB cache not available, skipping cache storage")
+            return
+            
         try:
             cache_key = self._generate_cache_key(hours, source_filter)
             expires_at = datetime.now() + timedelta(hours=cache_duration_hours)
+            
+            logger.debug(f"Caching {len(reviews_response.reviews)} reviews with key: {cache_key}, expires at: {expires_at}")
             
             # Start transaction
             self.conn.begin()
@@ -273,8 +315,34 @@ class CacheService:
             logger.error(f"Error caching reviews: {e}")
             raise e
 
+    def debug_cache_contents(self) -> None:
+        """Debug method to show what's in the cache."""
+        if not self.conn:
+            logger.debug("DuckDB cache not available")
+            return
+            
+        try:
+            query = """
+            SELECT cache_key, expires_at, total_count, cached_at 
+            FROM cache_metadata 
+            ORDER BY cached_at DESC
+            """
+            results = self.conn.execute(query).fetchall()
+            
+            logger.debug("=== CACHE CONTENTS ===")
+            for row in results:
+                logger.debug(f"Key: {row[0]}, Expires: {row[1]}, Count: {row[2]}, Cached: {row[3]}")
+            logger.debug("======================")
+            
+        except Exception as e:
+            logger.error(f"Error debugging cache contents: {e}")
+
     def get_cache_stats(self) -> Dict[str, Any]:
         """Get cache statistics."""
+        if not self.conn:
+            logger.debug("DuckDB cache not available, returning empty stats")
+            return {}
+            
         try:
             stats_query = """
             SELECT 
@@ -302,6 +370,10 @@ class CacheService:
 
     def clear_cache(self, cache_key: Optional[str] = None) -> None:
         """Clear cache entries."""
+        if not self.conn:
+            logger.debug("DuckDB cache not available, cannot clear cache")
+            return
+            
         try:
             if cache_key:
                 self.conn.execute("DELETE FROM cache_metadata WHERE cache_key = ?", [cache_key])
@@ -317,8 +389,17 @@ class CacheService:
     def close(self) -> None:
         """Close database connection."""
         if self.conn:
-            self.conn.close()
+            try:
+                self.conn.close()
+                logger.info("DuckDB cache connection closed")
+            except Exception as e:
+                logger.warning(f"Error closing DuckDB connection: {e}")
+            finally:
+                self.conn = None
 
     def __del__(self):
         """Cleanup on deletion."""
-        self.close()
+        try:
+            self.close()
+        except Exception:
+            pass  # Ignore errors during cleanup

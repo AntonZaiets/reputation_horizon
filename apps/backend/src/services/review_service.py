@@ -44,6 +44,8 @@ class ReviewService:
         try:
             # Try cache first if enabled and not forcing refresh
             if cached and not force_refresh:
+                logger.debug(f"Attempting to retrieve cached reviews for {hours}h (max_age: {self.max_cache_age_hours}h)")
+                
                 cached_response = self.cache_service.get_cached_reviews(
                     hours=hours,
                     source_filter=source_filter,
@@ -51,8 +53,10 @@ class ReviewService:
                 )
                 
                 if cached_response:
-                    logger.info(f"Served {len(cached_response.reviews)} reviews from cache")
+                    logger.info(f"✅ Cache HIT: Served {len(cached_response.reviews)} reviews from cache")
                     return cached_response
+                else:
+                    logger.info(f"❌ Cache MISS: No valid cache found for {hours}h")
 
             # Fetch fresh data from Wextractor
             logger.info(f"Fetching fresh reviews for {hours} hours from Wextractor API")
