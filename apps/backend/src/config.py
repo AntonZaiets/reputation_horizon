@@ -1,43 +1,30 @@
-from pathlib import Path
-
-from dotenv import load_dotenv
-from pydantic_settings import BaseSettings, SettingsConfigDict
-
-# Load .env file explicitly
-env_path = Path(__file__).parent.parent / ".env"
-
-load_dotenv(dotenv_path=env_path)
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
-
-    # API Configuration
-    port: int = 8000
-    host: str = "0.0.0.0"
+    # Server settings
     environment: str = "development"
+    host: str = "0.0.0.0"
+    port: int = 8000
 
-    # LLM Configuration
+    # OpenAI settings
+    openai_api_key: str
     llm_provider: str = "openai"
-    llm_model: str = "gpt-4o-mini"
+    llm_model: str = "gpt-5-nano"
     llm_temperature: float = 0.7
 
-    # API Keys
-    openai_api_key: str | None = None
-    anthropic_api_key: str | None = None
+    # Google Search settings
+    google_search_api_key: str | None = None
+    google_search_engine_id: str | None = None
 
-    # Wextractor API Configuration
-    wextractor_api_key: str | None = None
-    wextractor_api_url: str = "https://wextractor.com"
-    preply_app_id_google: str = "com.preply"
-    preply_app_id_apple: str = "1352790442"
+    # Wextractor settings
+    wextractor_api_key: str
+    wextractor_api_url: str = "https://api.wextractor.com"
 
-    model_config = SettingsConfigDict(
-        env_file="../.env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="ignore",
-    )
+    # App settings
+    preply_app_id_google: str = "com.preply.android"
+    preply_app_id_apple: str = "1400521332"
 
+    class Config:
+        env_file = ".env"
 
-# Global settings instance
 settings = Settings()

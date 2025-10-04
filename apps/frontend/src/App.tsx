@@ -5,6 +5,7 @@ import StatsCard from './components/StatsCard'
 import FilterBar from './components/FilterBar'
 import Header from './components/Header'
 import ReputationAnalysis from './components/ReputationAnalysis'
+import { GoogleReputationAnalysis } from './components/GoogleReputationAnalysis'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { Notification } from './components/Notification'
 import { LoadingSpinner } from './components/LoadingSpinner'
@@ -13,6 +14,7 @@ import { MESSAGES } from './constants'
 
 function App() {
   const [showAnalysis, setShowAnalysis] = useState(false)
+  const [showGoogleAnalysis, setShowGoogleAnalysis] = useState(false)
   const [notificationError, setNotificationError] = useState<any>(null)
   
   const {
@@ -60,10 +62,20 @@ function App() {
             >
               {showAnalysis ? '📊 Приховати аналіз' : '🤖 Показати AI аналіз репутації'}
             </button>
+            <button 
+              className={`toggle-button ${showGoogleAnalysis ? 'active' : ''}`}
+              onClick={() => setShowGoogleAnalysis(!showGoogleAnalysis)}
+            >
+              {showGoogleAnalysis ? '🔍 Приховати Google аналіз' : '🔍 Google аналіз репутації'}
+            </button>
           </div>
 
           {showAnalysis && (
             <ReputationAnalysis onAnalysisComplete={handleAnalysisComplete} />
+          )}
+
+          {showGoogleAnalysis && (
+            <GoogleReputationAnalysis onClose={() => setShowGoogleAnalysis(false)} />
           )}
           
           <FilterBar
