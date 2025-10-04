@@ -53,14 +53,38 @@ class WextractorService:
             # Combine and process reviews
             all_reviews = google_reviews + apple_reviews
 
-            # Sort by date (newest first)
-            all_reviews.sort(key=lambda x: x.date, reverse=True)
+            # Filter reviews by date (only keep reviews from the last N hours)
+            filtered_reviews = []
+            logger.info(f"Filtering {len(all_reviews)} reviews for the last {hours} hours (since {time_threshold})")
+            
+            for review in all_reviews:
+                try:
+                    # Parse review date
+                    review_date = datetime.fromisoformat(review.date.replace('Z', '+00:00'))
+                    # Convert to local timezone for comparison
+                    review_date_local = review_date.replace(tzinfo=None)
+                    
+                    if review_date_local >= time_threshold:
+                        filtered_reviews.append(review)
+                    else:
+                        logger.debug(f"Filtering out old review from {review_date_local} (older than {time_threshold})")
+                except Exception as e:
+                    logger.warning(f"Failed to parse review date {review.date}: {e}")
+                    # Include review if date parsing fails (to be safe)
+                    filtered_reviews.append(review)
+            
+            logger.info(f"After filtering: {len(filtered_reviews)} reviews remain from the last {hours} hours")
 
-            # Calculate statistics
-            stats = self._calculate_stats(all_reviews, len(google_reviews), len(apple_reviews))
+            # Sort by date (newest first)
+            filtered_reviews.sort(key=lambda x: x.date, reverse=True)
+
+            # Calculate statistics using filtered reviews
+            google_filtered = [r for r in filtered_reviews if r.source == "google"]
+            apple_filtered = [r for r in filtered_reviews if r.source == "apple"]
+            stats = self._calculate_stats(filtered_reviews, len(google_filtered), len(apple_filtered))
 
             return {
-                "reviews": all_reviews,
+                "reviews": filtered_reviews,
                 "stats": stats,
                 "fetched_at": datetime.now().isoformat(),
                 "time_range_hours": hours,

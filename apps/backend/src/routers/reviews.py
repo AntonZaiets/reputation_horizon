@@ -41,6 +41,7 @@ async def get_preply_reviews(
     try:
         logger.info(f"Fetching reviews for the last {hours} hours")
         result = await wextractor_service.get_reviews(hours=hours)
+        logger.info(f"Returning {len(result['reviews'])} reviews from the last {hours} hours")
         return ReviewsResponse(**result)
 
     except ValueError as e:
