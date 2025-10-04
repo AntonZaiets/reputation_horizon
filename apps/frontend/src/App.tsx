@@ -1,16 +1,18 @@
-import React, { useState } from 'react'
+import React, { useState, Suspense, lazy } from 'react'
 import './App.css'
 import ReviewCard from './components/ReviewCard'
 import StatsCard from './components/StatsCard'
 import FilterBar from './components/FilterBar'
 import Header from './components/Header'
-import ReputationAnalysis from './components/ReputationAnalysis'
-import { GoogleReputationAnalysis } from './components/GoogleReputationAnalysis'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { Notification } from './components/Notification'
 import { LoadingSpinner } from './components/LoadingSpinner'
 import { useReviews } from './hooks/useReviews'
 import { MESSAGES } from './constants'
+
+// Lazy load heavy components
+const ReputationAnalysis = lazy(() => import('./components/ReputationAnalysis'))
+const GoogleReputationAnalysis = lazy(() => import('./components/GoogleReputationAnalysis').then(module => ({ default: module.GoogleReputationAnalysis })))
 
 function App() {
   const [showAnalysis, setShowAnalysis] = useState(false)
@@ -31,14 +33,14 @@ function App() {
     refreshReviews
   } = useReviews()
 
-  // Обробка помилок
+  // Error handling
   React.useEffect(() => {
     if (loadingState.error) {
       setNotificationError(loadingState.error)
     }
   }, [loadingState.error])
 
-  // Автоматично запускаємо Google аналіз при відкритті сайту
+  // Automatically run Google analysis when opening the site
   React.useEffect(() => {
     const runGoogleAnalysis = async () => {
       setGoogleAnalysisLoading(true)
@@ -54,7 +56,7 @@ function App() {
         
         const data = await response.json()
         setGoogleAnalysisData(data)
-        // Автоматично відкриваємо аналіз після завершення
+        // Automatically open analysis after completion
         setShowGoogleAnalysis(true)
       } catch (err) {
         setGoogleAnalysisError(err instanceof Error ? err.message : 'Failed to analyze reputation')
@@ -83,37 +85,68 @@ function App() {
           loading={loadingState.isLoading} 
         />
         
-        <div className="container">
-          <StatsCard stats={stats} />
+        <main className="container" role="main">
+          <section aria-labelledby="stats-heading">
+            <h2 id="stats-heading" className="sr-only">Reviews Statistics</h2>
+            <StatsCard stats={stats} />
+          </section>
           
-          <div className="analysis-toggle">
+          <section className="analysis-toggle" aria-labelledby="analysis-heading">
+            <h2 id="analysis-heading" className="sr-only">Reputation Analysis</h2>
             <button 
               className={`toggle-button ${showAnalysis ? 'active' : ''}`}
               onClick={() => setShowAnalysis(!showAnalysis)}
+              aria-pressed={showAnalysis}
+              aria-expanded={showAnalysis}
+              aria-controls="ai-analysis-section"
             >
-              {showAnalysis ? '📊 Приховати аналіз' : '🤖 Показати AI аналіз репутації'}
+              <span aria-hidden="true">🤖</span>
+              {showAnalysis ? 'Hide Analysis' : 'Show AI Reputation Analysis'}
             </button>
             <button 
               className={`toggle-button ${showGoogleAnalysis ? 'active' : ''}`}
               onClick={() => setShowGoogleAnalysis(!showGoogleAnalysis)}
+              aria-pressed={showGoogleAnalysis}
+              aria-expanded={showGoogleAnalysis}
+              aria-controls="google-analysis-section"
+              disabled={googleAnalysisLoading}
             >
-              {showGoogleAnalysis ? '🔍 Приховати Google аналіз' : 
-               googleAnalysisLoading ? '⏳ Аналіз виконується...' :
-               '🔍 Google аналіз репутації'}
+              <span aria-hidden="true">🔍</span>
+              {showGoogleAnalysis ? 'Hide Google Analysis' : 
+               googleAnalysisLoading ? 'Analysis in progress...' :
+               'Google Reputation Analysis'}
             </button>
-          </div>
+          </section>
 
           {showAnalysis && (
-            <ReputationAnalysis onAnalysisComplete={handleAnalysisComplete} />
+            <section id="ai-analysis-section" aria-labelledby="ai-analysis-heading">
+              <h2 id="ai-analysis-heading" className="sr-only">AI Reputation Analysis</h2>
+              <Suspense fallback={
+                <div className="loading-container">
+                  <LoadingSpinner message="Loading AI analysis..." size="large" />
+                </div>
+              }>
+                <ReputationAnalysis onAnalysisComplete={handleAnalysisComplete} />
+              </Suspense>
+            </section>
           )}
 
           {showGoogleAnalysis && (
-            <GoogleReputationAnalysis 
-              onClose={() => setShowGoogleAnalysis(false)}
-              data={googleAnalysisData}
-              loading={googleAnalysisLoading}
-              error={googleAnalysisError}
-            />
+            <section id="google-analysis-section" aria-labelledby="google-analysis-heading">
+              <h2 id="google-analysis-heading" className="sr-only">Google Reputation Analysis</h2>
+              <Suspense fallback={
+                <div className="loading-container">
+                  <LoadingSpinner message="Loading Google analysis..." size="large" />
+                </div>
+              }>
+                <GoogleReputationAnalysis 
+                  onClose={() => setShowGoogleAnalysis(false)}
+                  data={googleAnalysisData}
+                  loading={googleAnalysisLoading}
+                  error={googleAnalysisError}
+                />
+              </Suspense>
+            </section>
           )}
           
           <FilterBar
@@ -123,30 +156,34 @@ function App() {
             setSortBy={setSortBy}
           />
 
-          <div className="reviews-section">
-            <h2 className="section-title">
-              Відгуки за останні 7 днів
-              <span className="review-count">{filteredReviews.length}</span>
+          <section className="reviews-section" aria-labelledby="reviews-heading">
+            <h2 id="reviews-heading" className="section-title">
+              Reviews from the last 7 days
+              <span className="review-count" aria-label={`Number of reviews: ${filteredReviews.length}`}>
+                {filteredReviews.length}
+              </span>
             </h2>
 
             {loadingState.isLoading ? (
-              <LoadingSpinner 
-                message={MESSAGES.LOADING_REVIEWS} 
-                size="large"
-              />
+              <div role="status" aria-live="polite">
+                <LoadingSpinner 
+                  message={MESSAGES.LOADING_REVIEWS} 
+                  size="large"
+                />
+              </div>
             ) : filteredReviews.length === 0 ? (
-              <div className="no-reviews">
+              <div className="no-reviews" role="status" aria-live="polite">
                 <p>{MESSAGES.NO_REVIEWS}</p>
               </div>
             ) : (
-              <div className="reviews-grid">
+              <div className="reviews-grid" role="list" aria-label="Reviews list">
                 {filteredReviews.map(review => (
                   <ReviewCard key={review.id} review={review} />
                 ))}
               </div>
             )}
-          </div>
-        </div>
+          </section>
+        </main>
       </div>
     </ErrorBoundary>
   )

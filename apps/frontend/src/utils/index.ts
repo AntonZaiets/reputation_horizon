@@ -1,6 +1,6 @@
 import { Review, ApiReview, ApiResponse, FilterType, SortType } from '../types'
 
-// Форматування дати
+// Date formatting
 export const formatDate = (date: Date): string => {
   const now = new Date()
   const diff = now.getTime() - date.getTime()
@@ -8,14 +8,14 @@ export const formatDate = (date: Date): string => {
   const minutes = Math.floor(diff / (1000 * 60))
 
   if (hours < 1) {
-    return `${minutes} хв тому`
+    return `${minutes} min ago`
   } else if (hours < 24) {
-    return `${hours} год тому`
+    return `${hours} hours ago`
   }
-  return date.toLocaleDateString('uk-UA')
+  return date.toLocaleDateString('en-US')
 }
 
-// Мапінг API відповіді на внутрішній формат
+// API response mapping to internal format
 export const mapApiResponseToReviews = (data: { reviews: any[] }): Review[] => {
   return data.reviews.map((review: any) => ({
     id: review.id,

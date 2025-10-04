@@ -17,7 +17,7 @@
 
 .analysis-header h2 {
   margin: 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 24px;
   font-weight: 700;
 }
@@ -26,12 +26,12 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
   font-size: 14px;
 }
 
 .refresh-button {
-  background: #3b82f6;
+  background: var(--gradient-primary);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -39,11 +39,12 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .refresh-button:hover {
-  background: #2563eb;
+  background: var(--gradient-gold);
+  transform: translateY(-1px);
 }
 
 .tabs {
@@ -60,20 +61,20 @@
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
 }
 
 .tab:hover {
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
   background: #f9fafb;
 }
 
 .tab.active {
-  color: #3b82f6;
-  border-bottom-color: #3b82f6;
-  background: #eff6ff;
+  color: var(--color-primary-600);
+  border-bottom-color: var(--color-primary-600);
+  background: var(--color-primary-50);
 }
 
 /* Overview Tab */
@@ -87,7 +88,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--gradient-primary);
   border-radius: 12px;
   color: white;
 }
@@ -141,7 +142,7 @@
 
 .sentiment-distribution h3 {
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 18px;
   font-weight: 600;
 }
@@ -169,7 +170,7 @@
 }
 
 .sentiment-label.neutral {
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
 }
 
 .sentiment-label.negative {
@@ -205,7 +206,7 @@
   min-width: 30px;
   text-align: right;
   font-weight: 600;
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
 }
 
 .top-issues, .positive-aspects {
@@ -216,7 +217,7 @@
 
 .top-issues h3, .positive-aspects h3 {
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 18px;
   font-weight: 600;
 }
@@ -234,7 +235,7 @@
 }
 
 .issue-rank {
-  background: #3b82f6;
+  background: var(--gradient-primary);
   color: white;
   width: 24px;
   height: 24px;
@@ -247,7 +248,7 @@
 }
 
 .issue-text {
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
   font-size: 14px;
 }
 
@@ -269,7 +270,7 @@
 /* Insights Tab */
 .insights-tab h3 {
   margin: 0 0 20px 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 20px;
   font-weight: 600;
 }
@@ -301,7 +302,7 @@
 
 .review-id {
   font-weight: 600;
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
   font-size: 14px;
 }
 
@@ -335,12 +336,12 @@
 
 .confidence {
   font-size: 12px;
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
 }
 
 .intent-info, .topics-info, .recommended-action {
   font-size: 14px;
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
 }
 
 .action-required {
@@ -356,7 +357,7 @@
 /* Issues Tab */
 .issues-tab h3 {
   margin: 0 0 20px 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 20px;
   font-weight: 600;
 }
@@ -392,7 +393,7 @@
 
 .issue-header h4 {
   margin: 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 18px;
   font-weight: 600;
 }
@@ -420,13 +421,13 @@
 
 .stat-label {
   font-size: 12px;
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
   font-weight: 500;
 }
 
 .stat-value {
   font-size: 16px;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-weight: 600;
 }
 
@@ -434,17 +435,17 @@
   background: #f3f4f6;
   padding: 12px;
   border-radius: 6px;
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid var(--color-primary-500);
 }
 
 .issue-recommendation strong {
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 14px;
 }
 
 .issue-recommendation p {
   margin: 8px 0 0 0;
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
   font-size: 14px;
   line-height: 1.5;
 }
@@ -459,7 +460,7 @@
   width: 40px;
   height: 40px;
   border: 4px solid #f3f4f6;
-  border-top: 4px solid #3b82f6;
+  border-top: 4px solid var(--color-primary-500);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto 16px;
@@ -471,7 +472,7 @@
 }
 
 .retry-button {
-  background: #3b82f6;
+  background: var(--gradient-primary);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -480,34 +481,209 @@
   font-size: 16px;
   font-weight: 500;
   margin-top: 16px;
+  transition: all 0.2s;
 }
 
 .retry-button:hover {
-  background: #2563eb;
+  background: var(--gradient-gold);
+  transform: translateY(-1px);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .overview-tab {
-    grid-template-columns: 1fr;
+/* Mobile First Responsive Design */
+
+/* Base mobile styles (320px+) */
+.reputation-analysis {
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.analysis-header {
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+  padding-bottom: 1rem;
+}
+
+.analysis-header h2 {
+  font-size: 1.25rem;
+}
+
+.analysis-meta {
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.tabs {
+  flex-direction: column;
+  gap: 0.5rem;
+  border-bottom: none;
+}
+
+.tab {
+  padding: 12px 16px;
+  font-size: 14px;
+  border-bottom: 2px solid transparent;
+  border-radius: 8px;
+  text-align: center;
+  min-height: 44px; /* Touch-friendly */
+}
+
+.overview-tab {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.score-card {
+  padding: 1.5rem;
+}
+
+.score-display {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.score-circle {
+  width: 60px;
+  height: 60px;
+  font-size: 20px;
+}
+
+.sentiment-bars {
+  gap: 1rem;
+}
+
+.sentiment-bar {
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.sentiment-label {
+  min-width: auto;
+  font-size: 12px;
+}
+
+.bar-container {
+  width: 100%;
+  height: 16px;
+}
+
+.insights-grid {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.insight-card {
+  padding: 1rem;
+}
+
+.issue-stats {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.priority-issue-card {
+  padding: 1rem;
+}
+
+/* Tablet styles (768px+) */
+@media (min-width: 768px) {
+  .reputation-analysis {
+    padding: 1.5rem;
+    margin: 1.5rem 0;
   }
-  
-  .score-display {
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  .insights-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .issue-stats {
-    grid-template-columns: 1fr;
-  }
-  
+
   .analysis-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .analysis-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .analysis-meta {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .tabs {
+    flex-direction: row;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .tab {
+    text-align: left;
+    min-height: auto;
+  }
+
+  .overview-tab {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .score-card {
+    grid-column: 1 / -1;
+    padding: 2rem;
+  }
+
+  .score-display {
+    flex-direction: row;
+    gap: 2rem;
+  }
+
+  .score-circle {
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+  }
+
+  .sentiment-distribution {
+    grid-column: 1 / -1;
+  }
+
+  .sentiment-bars {
+    gap: 0.75rem;
+  }
+
+  .sentiment-bar {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .sentiment-label {
+    min-width: 80px;
+    font-size: 14px;
+  }
+
+  .bar-container {
+    width: auto;
+    height: 20px;
+  }
+
+  .insights-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .issue-stats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+/* Desktop styles (1024px+) */
+@media (min-width: 1024px) {
+  .reputation-analysis {
+    padding: 2rem;
+    margin: 2rem 0;
+  }
+
+  .insights-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+
+  .priority-issue-card {
+    padding: 1.5rem;
   }
 }
