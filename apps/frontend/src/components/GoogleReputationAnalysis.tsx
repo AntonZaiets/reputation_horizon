@@ -3,6 +3,9 @@ import './GoogleReputationAnalysis.css';
 
 interface GoogleReputationAnalysisProps {
   onClose?: () => void;
+  data?: AnalysisResult | null;
+  loading?: boolean;
+  error?: string | null;
 }
 
 interface AnalysisResult {
@@ -52,7 +55,12 @@ interface JSONAnalysisData {
 }
 
 const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
-  const getSeverityColor = (severity: string) => {
+  // Перевіряємо, чи дані існують
+  if (!data) {
+    return <div className="error-message">No analysis data available</div>;
+  }
+  const getSeverityColor = (severity: string | undefined) => {
+    if (!severity) return '#6b7280';
     switch (severity.toLowerCase()) {
       case 'high': return '#ef4444';
       case 'medium': return '#f59e0b';
@@ -61,7 +69,8 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
     }
   };
 
-  const getUrgencyColor = (urgency: string) => {
+  const getUrgencyColor = (urgency: string | undefined) => {
+    if (!urgency) return '#6b7280';
     switch (urgency.toLowerCase()) {
       case 'high': return '#ef4444';
       case 'medium': return '#f59e0b';
@@ -75,8 +84,8 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
       {/* Overall Score */}
       <div className="score-section">
         <div className="score-card">
-          <div className="score-rating">{data.overall_score.rating}</div>
-          <p className="score-reason">{data.overall_score.brief_reason}</p>
+          <div className="score-rating">{data.overall_score?.rating || 'N/A'}</div>
+          <p className="score-reason">{data.overall_score?.brief_reason || 'No rating available'}</p>
         </div>
       </div>
 
@@ -84,7 +93,7 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
       <div className="strengths-section">
         <h3>✅ Key Strengths</h3>
         <div className="strengths-grid">
-          {data.key_strengths.map((strength, index) => (
+          {data.key_strengths?.map((strength, index) => (
             <div key={index} className="strength-card">
               <h4>{strength.name || strength.strength}</h4>
               <div className="impact-badge" style={{ backgroundColor: getSeverityColor(strength.impact) }}>
@@ -92,7 +101,7 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
               </div>
               {strength.explanation && <p>{strength.explanation}</p>}
             </div>
-          ))}
+          )) || []}
         </div>
       </div>
 
@@ -100,7 +109,7 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
       <div className="issues-section">
         <h3>⚠️ Critical Issues</h3>
         <div className="issues-grid">
-          {data.critical_issues.map((issue, index) => (
+          {data.critical_issues?.map((issue, index) => (
             <div key={index} className="issue-card">
               <div className="issue-header">
                 <h4>{issue.issue}</h4>
@@ -112,7 +121,7 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
                 <p className="issue-explanation">{issue.explanation || issue.why_critical}</p>
               )}
             </div>
-          ))}
+          )) || []}
         </div>
       </div>
 
@@ -120,10 +129,10 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
       <div className="risks-section">
         <h3>🎯 Risk Assessment</h3>
         <div className="risk-overview">
-          <p className="risk-impact">{data.risk_assessment.overall_business_impact}</p>
+          <p className="risk-impact">{data.risk_assessment?.overall_business_impact}</p>
         </div>
         <div className="risks-grid">
-          {data.risk_assessment.main_risks.map((risk, index) => (
+          {data.risk_assessment?.main_risks?.map((risk, index) => (
             <div key={index} className="risk-card">
               <h4>{risk.name || risk.risk}</h4>
               <div className="risk-metrics">
@@ -131,7 +140,7 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
                 <span className="consequence">Consequence: {risk.consequence}</span>
               </div>
             </div>
-          ))}
+          )) || []}
         </div>
       </div>
 
@@ -139,7 +148,7 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
       <div className="actions-section">
         <h3>🚀 Priority Actions</h3>
         <div className="actions-grid">
-          {data.priority_actions.map((action, index) => (
+          {data.priority_actions?.map((action, index) => (
             <div key={index} className="action-card">
               <h4>{action.action}</h4>
               <div className="action-metrics">
@@ -151,43 +160,31 @@ const JSONAnalysis: React.FC<{ data: JSONAnalysisData }> = ({ data }) => {
                 </div>
               </div>
             </div>
-          ))}
+          )) || []}
         </div>
       </div>
 
       {/* Data Sources */}
       <div className="sources-info">
-        <p className="sources-count">📑 Analyzed {data.data_sources} data sources</p>
+        <p className="sources-count">📑 Analyzed {data.data_sources || 0} data sources</p>
       </div>
     </div>
   );
 };
 
-export const GoogleReputationAnalysis: React.FC<GoogleReputationAnalysisProps> = ({ onClose }) => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
+export const GoogleReputationAnalysis: React.FC<GoogleReputationAnalysisProps> = ({ 
+  onClose, 
+  data, 
+  loading, 
+  error 
+}) => {
+  // Автоматично показуємо результати, якщо дані є
+  const showResults = !!data && !loading;
 
-  const analyzeReputation = async () => {
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      const response = await fetch('http://localhost:8000/api/reputation/analyze/preply');
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setResult(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Не вдалося виконати аналіз');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Використовуємо дані з пропсів
+  const result = data;
+  const isLoading = loading || false;
+  const errorMessage = error;
 
   const formatAnalysis = (analysis: string) => {
     try {
@@ -228,43 +225,27 @@ export const GoogleReputationAnalysis: React.FC<GoogleReputationAnalysisProps> =
 
   return (
     <div className="google-reputation-container">
-      {!result && (
+      {isLoading && (
         <div className="intro-section">
           <p className="intro-text">
             This tool uses Google Search API to find information about Preply's reputation 
             and OpenAI for deep analysis of the found data.
           </p>
-          <button 
-            className="analyze-btn"
-            onClick={analyzeReputation}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="spinner"></span>
-                Analyzing...
-              </>
-            ) : (
-              <>
-                <span className="icon">🔍</span>
-                Start Reputation Analysis
-              </>
-            )}
-          </button>
+          <div className="analyze-btn" style={{ cursor: 'default' }}>
+            <span className="spinner"></span>
+            Analyzing...
+          </div>
         </div>
       )}
 
-      {error && (
+      {errorMessage && (
         <div className="error-message">
           <h3>❌ Error</h3>
-          <p>{error}</p>
-          <button onClick={analyzeReputation} className="retry-btn">
-            Try Again
-          </button>
+          <p>{errorMessage}</p>
         </div>
       )}
 
-      {result && (
+      {showResults && result && (
         <div className="results-container">
           <div className="analysis-content">
             {formatAnalysis(result.analysis)}
@@ -293,11 +274,10 @@ export const GoogleReputationAnalysis: React.FC<GoogleReputationAnalysisProps> =
           <button 
             className="new-analysis-btn"
             onClick={() => {
-              setResult(null);
-              setError(null);
+              // Можна додати логіку для нового аналізу
             }}
           >
-            New Analysis
+            Hide Results
           </button>
         </div>
       )}

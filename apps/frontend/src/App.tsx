@@ -16,6 +16,9 @@ function App() {
   const [showAnalysis, setShowAnalysis] = useState(false)
   const [showGoogleAnalysis, setShowGoogleAnalysis] = useState(false)
   const [notificationError, setNotificationError] = useState<any>(null)
+  const [googleAnalysisData, setGoogleAnalysisData] = useState<any>(null)
+  const [googleAnalysisLoading, setGoogleAnalysisLoading] = useState(false)
+  const [googleAnalysisError, setGoogleAnalysisError] = useState<string | null>(null)
   
   const {
     filteredReviews,
@@ -34,6 +37,34 @@ function App() {
       setNotificationError(loadingState.error)
     }
   }, [loadingState.error])
+
+  // Автоматично запускаємо Google аналіз при відкритті сайту
+  React.useEffect(() => {
+    const runGoogleAnalysis = async () => {
+      setGoogleAnalysisLoading(true)
+      setGoogleAnalysisError(null)
+      setGoogleAnalysisData(null)
+
+      try {
+        const response = await fetch('http://localhost:8000/api/reputation/analyze/preply')
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const data = await response.json()
+        setGoogleAnalysisData(data)
+        // Автоматично відкриваємо аналіз після завершення
+        setShowGoogleAnalysis(true)
+      } catch (err) {
+        setGoogleAnalysisError(err instanceof Error ? err.message : 'Failed to analyze reputation')
+      } finally {
+        setGoogleAnalysisLoading(false)
+      }
+    }
+
+    runGoogleAnalysis()
+  }, [])
 
   const handleAnalysisComplete = (data: any) => {
     console.log('Reputation analysis completed:', data)
@@ -66,7 +97,9 @@ function App() {
               className={`toggle-button ${showGoogleAnalysis ? 'active' : ''}`}
               onClick={() => setShowGoogleAnalysis(!showGoogleAnalysis)}
             >
-              {showGoogleAnalysis ? '🔍 Приховати Google аналіз' : '🔍 Google аналіз репутації'}
+              {showGoogleAnalysis ? '🔍 Приховати Google аналіз' : 
+               googleAnalysisLoading ? '⏳ Аналіз виконується...' :
+               '🔍 Google аналіз репутації'}
             </button>
           </div>
 
@@ -75,7 +108,12 @@ function App() {
           )}
 
           {showGoogleAnalysis && (
-            <GoogleReputationAnalysis onClose={() => setShowGoogleAnalysis(false)} />
+            <GoogleReputationAnalysis 
+              onClose={() => setShowGoogleAnalysis(false)}
+              data={googleAnalysisData}
+              loading={googleAnalysisLoading}
+              error={googleAnalysisError}
+            />
           )}
           
           <FilterBar
