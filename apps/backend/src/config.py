@@ -13,7 +13,7 @@ class Settings(BaseSettings):
 
     # LLM Configuration
     llm_provider: str = "openai"
-    llm_model: str = "gpt-4o-mini"
+    llm_model: str = "gpt-5-nano"
     llm_temperature: float = 0.7
 
     # API Keys
