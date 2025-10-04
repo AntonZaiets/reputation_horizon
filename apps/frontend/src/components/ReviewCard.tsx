@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Review } from '../types'
 import { formatDate, renderStars, getRatingClass } from '../utils'
 
@@ -6,50 +6,54 @@ interface ReviewCardProps {
   review: Review
 }
 
-export default function ReviewCard({ review }: ReviewCardProps) {
+const ReviewCard = memo(function ReviewCard({ review }: ReviewCardProps) {
+  const getSourceName = () => {
+    if (review.platform === 'Google Play' || review.source === 'google') return 'Google Play'
+    if (review.platform === 'App Store' || review.source === 'apple') return 'App Store'
+    return 'Trustpilot'
+  }
+
+  const getSourceIcon = () => {
+    if (review.platform === 'Google Play' || review.source === 'google') return '🤖'
+    if (review.platform === 'App Store' || review.source === 'apple') return '🍎'
+    return '⭐'
+  }
 
   return (
-    <div className={`review-card ${review.source}`}>
-      <div className="review-header">
+    <article className={`review-card ${review.source}`} role="article" aria-labelledby={`review-${review.id}`}>
+      <header className="review-header">
         <div className="review-user">
-          <div className="user-avatar">
+          <div className="user-avatar" aria-hidden="true">
             {(review.userName || 'A').charAt(0).toUpperCase()}
           </div>
           <div className="user-info">
-            <div className="user-name">{review.userName || 'Anonymous'}</div>
+            <h3 className="user-name" id={`review-${review.id}`}>
+              {review.userName || 'Anonymous'}
+            </h3>
             <div className="review-meta">
-              <span className="review-date">{formatDate(review.date)}</span>
+              <time className="review-date" dateTime={review.date}>
+                {formatDate(review.date)}
+              </time>
               {review.version && (
                 <>
-                  <span className="separator">•</span>
+                  <span className="separator" aria-hidden="true">•</span>
                   <span className="review-version">v{review.version}</span>
                 </>
               )}
             </div>
           </div>
         </div>
-        <div className={`source-badge ${review.source || review.platform?.toLowerCase().replace(' ', '')}`}>
-          {review.platform === 'Google Play' || review.source === 'google' ? (
-            <>
-              <span className="source-icon">🤖</span>
-              <span className="source-text">Google Play</span>
-            </>
-          ) : review.platform === 'App Store' || review.source === 'apple' ? (
-            <>
-              <span className="source-icon">🍎</span>
-              <span className="source-text">App Store</span>
-            </>
-          ) : (
-            <>
-              <span className="source-icon">⭐</span>
-              <span className="source-text">Trustpilot</span>
-            </>
-          )}
+        <div 
+          className={`source-badge ${review.source || review.platform?.toLowerCase().replace(' ', '')}`}
+          aria-label={`Джерело: ${getSourceName()}`}
+        >
+          <span className="source-icon" aria-hidden="true">{getSourceIcon()}</span>
+          <span className="source-text">{getSourceName()}</span>
         </div>
-      </div>
+      </header>
 
-      <div className={`review-rating ${getRatingClass(review.rating)}`}>
-        <div className="stars">
+      <div className={`review-rating ${getRatingClass(review.rating)}`} role="img" aria-label={`Рейтинг: ${review.rating} з 5 зірок`}>
+        <div className="stars" aria-hidden="true">
           {renderStars(review.rating).map(star => (
             <span key={star.key} className={star.className}>
               {star.content}
@@ -64,14 +68,18 @@ export default function ReviewCard({ review }: ReviewCardProps) {
       </div>
 
       {review.thumbsUp !== undefined && (
-        <div className="review-footer">
+        <footer className="review-footer">
           <div className="thumbs-up">
-            <span className="thumbs-icon">👍</span>
-            <span className="thumbs-count">{review.thumbsUp} людей знайшли це корисним</span>
+            <span className="thumbs-icon" aria-hidden="true">👍</span>
+            <span className="thumbs-count">
+              {review.thumbsUp} {review.thumbsUp === 1 ? 'людина знайшла' : 'людей знайшли'} це корисним
+            </span>
           </div>
-        </div>
+        </footer>
       )}
-    </div>
+    </article>
   )
-}
+})
+
+export default ReviewCard
 

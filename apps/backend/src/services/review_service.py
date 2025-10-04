@@ -27,7 +27,8 @@ class ReviewService:
         hours: int = 24,
         source_filter: Optional[str] = None,
         cached: bool = True,
-        force_refresh: bool = False
+        force_refresh: bool = False,
+        max_trustpilot_pages: int = 20
     ) -> ReviewsResponse:
         """
         Get reviews with optional caching.
@@ -37,6 +38,7 @@ class ReviewService:
             source_filter: Optional source filter ('google' or 'apple')
             cached: Whether to use cached data (default: True)
             force_refresh: Force refresh even if cache exists
+            max_trustpilot_pages: Maximum number of Trustpilot pages to fetch
             
         Returns:
             ReviewsResponse with reviews and statistics
@@ -56,7 +58,10 @@ class ReviewService:
 
             # Fetch fresh data from Wextractor
             logger.info(f"Fetching fresh reviews for {hours} hours from Wextractor API")
-            fresh_response = await self.wextractor_service.get_reviews(hours=hours)
+            fresh_response = await self.wextractor_service.get_reviews(
+                hours=hours, 
+                max_trustpilot_pages=max_trustpilot_pages
+            )
             
             # Apply source filter if specified
             if source_filter:

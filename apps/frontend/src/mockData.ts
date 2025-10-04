@@ -1,51 +1,51 @@
 import { Review, Stats } from './App'
 
-// Мок-дані для відгуків
+// Mock data for reviews
 export const mockReviews: Review[] = [
   {
     id: '1',
-    userName: 'Олександр К.',
+    userName: 'Alexander K.',
     rating: 5,
-    text: 'Чудовий додаток для вивчення мов! Дуже зручний інтерфейс та якісні уроки. Рекомендую всім, хто серйозно ставиться до вивчення іноземних мов.',
-    date: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 години тому
+    text: 'Excellent app for learning languages! Very user-friendly interface and quality lessons. I recommend it to everyone who takes language learning seriously.',
+    date: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     source: 'google',
     version: '2.1.4',
     thumbsUp: 12
   },
   {
     id: '2',
-    userName: 'Марія П.',
+    userName: 'Maria P.',
     rating: 4,
-    text: 'Добре працює, але іноді є проблеми з синхронізацією. В цілому задоволена якістю уроків та підходом викладачів.',
-    date: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 години тому
+    text: 'Works well, but sometimes there are synchronization issues. Overall satisfied with the quality of lessons and teaching approach.',
+    date: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
     source: 'apple',
     version: '2.1.3'
   },
   {
     id: '3',
-    userName: 'Дмитро В.',
+    userName: 'Dmitry V.',
     rating: 5,
-    text: 'Найкращий додаток для вивчення англійської! Викладачі професійні, матеріали актуальні. За місяць значно покращив рівень мови.',
-    date: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 годин тому
+    text: 'Best app for learning English! Teachers are professional, materials are up-to-date. Significantly improved my language level in a month.',
+    date: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
     source: 'google',
     version: '2.1.4',
     thumbsUp: 8
   },
   {
     id: '4',
-    userName: 'Анна С.',
+    userName: 'Anna S.',
     rating: 3,
-    text: 'Середньо. Є як плюси, так і мінуси. Інтерфейс міг би бути зручнішим, але контент якісний.',
-    date: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 годин тому
+    text: 'Average. Has both pros and cons. Interface could be more user-friendly, but content is quality.',
+    date: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
     source: 'apple',
     version: '2.1.2'
   },
   {
     id: '5',
-    userName: 'Ігор М.',
+    userName: 'Igor M.',
     rating: 5,
-    text: 'Відмінний сервіс! Вивчаю німецьку вже 3 місяці, прогресс очевидний. Викладачі дуже допомагають з вимовою.',
-    date: new Date(Date.now() - 10 * 60 * 60 * 1000), // 10 годин тому
+    text: 'Excellent service! I\'ve been learning German for 3 months, progress is obvious. Teachers really help with pronunciation.',
+    date: new Date(Date.now() - 10 * 60 * 60 * 1000), // 10 hours ago
     source: 'google',
     version: '2.1.4',
     thumbsUp: 15

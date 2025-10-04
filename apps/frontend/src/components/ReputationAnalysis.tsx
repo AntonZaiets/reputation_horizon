@@ -137,9 +137,9 @@ const ReputationAnalysis: React.FC<ReputationAnalysisProps> = ({ onAnalysisCompl
       <div className="reputation-analysis">
         <div className="error-container">
           <p>❌ {error.message}</p>
-          {error.code && <small>Код помилки: {error.code}</small>}
+          {error.code && <small>Error code: {error.code}</small>}
           <button onClick={loadAnalysis} className="retry-button">
-            Спробувати знову
+            Try Again
           </button>
         </div>
       </div>
@@ -149,7 +149,7 @@ const ReputationAnalysis: React.FC<ReputationAnalysisProps> = ({ onAnalysisCompl
   if (!analysisData) {
     return (
       <div className="reputation-analysis">
-        <p>Немає даних для аналізу</p>
+        <p>No data available for analysis</p>
       </div>
     )
   }
@@ -157,13 +157,13 @@ const ReputationAnalysis: React.FC<ReputationAnalysisProps> = ({ onAnalysisCompl
   return (
     <div className="reputation-analysis">
       <div className="analysis-header">
-        <h2>🤖 AI Аналіз Репутації</h2>
+        <h2>🤖 AI Reputation Analysis</h2>
         <div className="analysis-meta">
-          <span>Проаналізовано {analysisData.insights.length} відгуків</span>
+          <span>Analyzed {analysisData.insights.length} reviews</span>
           <span>•</span>
-          <span>За {analysisData.time_range_hours} годин</span>
+          <span>Over {analysisData.time_range_hours} hours</span>
           <button onClick={loadAnalysis} className="refresh-button">
-            🔄 Оновити
+            🔄 Refresh
           </button>
         </div>
       </div>
@@ -173,19 +173,19 @@ const ReputationAnalysis: React.FC<ReputationAnalysisProps> = ({ onAnalysisCompl
           className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
         >
-          📊 Огляд
+          📊 Overview
         </button>
         <button 
           className={`tab ${activeTab === 'insights' ? 'active' : ''}`}
           onClick={() => setActiveTab('insights')}
         >
-          🔍 Детальний аналіз
+          🔍 Detailed Analysis
         </button>
         <button 
           className={`tab ${activeTab === 'issues' ? 'active' : ''}`}
           onClick={() => setActiveTab('issues')}
         >
-          ⚠️ Пріоритетні проблеми
+          ⚠️ Priority Issues
         </button>
       </div>
 

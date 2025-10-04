@@ -38,11 +38,11 @@ export const ANIMATION_DURATION = {
   SLOW: 500
 } as const
 
-// Повідомлення
+// Messages
 export const MESSAGES = {
-  LOADING_REVIEWS: 'Завантаження відгуків...',
-  LOADING_ANALYSIS: 'Аналіз репутації...',
-  NO_REVIEWS: 'Відгуків не знайдено за вказаними фільтрами',
-  ERROR_LOADING: 'Не вдалося завантажити дані',
-  ERROR_BACKEND: 'Переконайтесь, що backend запущений на http://localhost:8000'
+  LOADING_REVIEWS: 'Loading reviews...',
+  LOADING_ANALYSIS: 'Analyzing reputation...',
+  NO_REVIEWS: 'No reviews found for the selected filters',
+  ERROR_LOADING: 'Failed to load data',
+  ERROR_BACKEND: 'Make sure the backend is running on http://localhost:8000'
 } as const
