@@ -1,5 +1,5 @@
 import React from 'react'
-import { Stats } from '../App'
+import { Stats } from '../types'
 
 interface StatsCardProps {
   stats: Stats

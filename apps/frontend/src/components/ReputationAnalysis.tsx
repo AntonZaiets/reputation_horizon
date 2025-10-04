@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import './ReputationAnalysis.css'
+import { AppError } from '../types'
+import { DEFAULT_SETTINGS, MESSAGES } from '../constants'
+import { api } from '../api'
 
 export interface ReputationInsight {
   review_id: string
@@ -64,7 +67,7 @@ interface ReputationAnalysisProps {
 const ReputationAnalysis: React.FC<ReputationAnalysisProps> = ({ onAnalysisComplete }) => {
   const [analysisData, setAnalysisData] = useState<ReputationAnalysisData | null>(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<AppError | null>(null)
   const [activeTab, setActiveTab] = useState<'overview' | 'insights' | 'issues'>('overview')
 
   const loadAnalysis = async () => {
@@ -72,20 +75,18 @@ const ReputationAnalysis: React.FC<ReputationAnalysisProps> = ({ onAnalysisCompl
     setError(null)
     
     try {
-      const response = await fetch('http://localhost:8000/api/reputation/analyze?hours=168&max_reviews=50')
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`)
-      }
-
-      const data = await response.json()
+      const data = await api.reputation.analyzeReputation(168, DEFAULT_SETTINGS.ANALYSIS_MAX_REVIEWS)
       setAnalysisData(data)
       onAnalysisComplete?.(data)
       
       console.log('✅ Reputation analysis loaded successfully')
     } catch (err) {
       console.error('❌ Error loading reputation analysis:', err)
-      setError('Не вдалося завантажити аналіз репутації. Переконайтесь, що backend запущений.')
+      setError({
+        message: MESSAGES.ERROR_LOADING,
+        code: 'REPUTATION_ANALYSIS_ERROR',
+        details: err
+      })
     } finally {
       setLoading(false)
     }
@@ -135,7 +136,8 @@ const ReputationAnalysis: React.FC<ReputationAnalysisProps> = ({ onAnalysisCompl
     return (
       <div className="reputation-analysis">
         <div className="error-container">
-          <p>❌ {error}</p>
+          <p>❌ {error.message}</p>
+          {error.code && <small>Код помилки: {error.code}</small>}
           <button onClick={loadAnalysis} className="retry-button">
             Спробувати знову
           </button>

@@ -1,10 +1,11 @@
 import React from 'react'
+import { FilterType, SortType } from '../types'
 
 interface FilterBarProps {
-  filter: 'all' | 'google' | 'apple'
-  setFilter: (filter: 'all' | 'google' | 'apple') => void
-  sortBy: 'date' | 'rating'
-  setSortBy: (sortBy: 'date' | 'rating') => void
+  filter: FilterType
+  setFilter: (filter: FilterType) => void
+  sortBy: SortType
+  setSortBy: (sortBy: SortType) => void
 }
 
 export default function FilterBar({ filter, setFilter, sortBy, setSortBy }: FilterBarProps) {

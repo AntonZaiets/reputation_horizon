@@ -1,38 +1,12 @@
 import React from 'react'
-import { Review } from '../App'
+import { Review } from '../types'
+import { formatDate, renderStars, getRatingClass } from '../utils'
 
 interface ReviewCardProps {
   review: Review
 }
 
 export default function ReviewCard({ review }: ReviewCardProps) {
-  const formatDate = (date: Date) => {
-    const now = new Date()
-    const diff = now.getTime() - date.getTime()
-    const hours = Math.floor(diff / (1000 * 60 * 60))
-    const minutes = Math.floor(diff / (1000 * 60))
-
-    if (hours < 1) {
-      return `${minutes} хв тому`
-    } else if (hours < 24) {
-      return `${hours} год тому`
-    }
-    return date.toLocaleDateString('uk-UA')
-  }
-
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <span key={i} className={`star ${i < rating ? 'filled' : ''}`}>
-        ⭐
-      </span>
-    ))
-  }
-
-  const getRatingClass = (rating: number) => {
-    if (rating >= 4) return 'positive'
-    if (rating <= 2) return 'negative'
-    return 'neutral'
-  }
 
   return (
     <div className={`review-card ${review.source}`}>
@@ -70,7 +44,13 @@ export default function ReviewCard({ review }: ReviewCardProps) {
       </div>
 
       <div className={`review-rating ${getRatingClass(review.rating)}`}>
-        <div className="stars">{renderStars(review.rating)}</div>
+        <div className="stars">
+          {renderStars(review.rating).map(star => (
+            <span key={star.key} className={star.className}>
+              {star.content}
+            </span>
+          ))}
+        </div>
         <span className="rating-number">{review.rating}/5</span>
       </div>
 
