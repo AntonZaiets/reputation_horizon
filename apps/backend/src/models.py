@@ -68,3 +68,76 @@ class ReviewsResponse(BaseModel):
     stats: ReviewStats = Field(..., description="Review statistics")
     fetched_at: str = Field(..., description="Timestamp when reviews were fetched")
     time_range_hours: int = Field(..., description="Time range in hours")
+
+
+# AI Analysis Models
+class SentimentAnalysis(BaseModel):
+    """Sentiment analysis result for a review."""
+    
+    sentiment: str = Field(..., description="Overall sentiment: positive, negative, neutral")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Confidence score (0-1)")
+    emotional_tone: str = Field(..., description="Emotional tone: happy, frustrated, satisfied, disappointed, etc.")
+    intensity: str = Field(..., description="Intensity level: low, medium, high")
+
+
+class IntentClassification(BaseModel):
+    """Intent classification for a review."""
+    
+    primary_intent: str = Field(..., description="Primary user intent: praise, complaint, question, suggestion, bug_report")
+    secondary_intents: list[str] = Field(default=[], description="Secondary intents if any")
+    urgency: str = Field(..., description="Urgency level: low, medium, high, critical")
+    action_required: bool = Field(..., description="Whether this review requires action")
+
+
+class TopicExtraction(BaseModel):
+    """Topic extraction result for a review."""
+    
+    main_topics: list[str] = Field(..., description="Main topics mentioned in the review")
+    subtopics: list[str] = Field(default=[], description="Subtopics and specific issues")
+    keywords: list[str] = Field(..., description="Key keywords and phrases")
+    categories: list[str] = Field(..., description="Categorized topics: ui_ux, performance, features, support, pricing, etc.")
+
+
+class ReputationInsight(BaseModel):
+    """Individual reputation insight for a review."""
+    
+    review_id: str = Field(..., description="ID of the analyzed review")
+    sentiment: SentimentAnalysis = Field(..., description="Sentiment analysis")
+    intent: IntentClassification = Field(..., description="Intent classification")
+    topics: TopicExtraction = Field(..., description="Topic extraction")
+    priority_score: float = Field(..., ge=0.0, le=10.0, description="Priority score for action (0-10)")
+    recommended_action: str = Field(..., description="Recommended action: none, respond, investigate, escalate")
+
+
+class ReputationScore(BaseModel):
+    """Overall reputation score and metrics."""
+    
+    overall_score: float = Field(..., ge=0.0, le=10.0, description="Overall reputation score (0-10)")
+    sentiment_distribution: dict[str, int] = Field(..., description="Distribution of sentiments")
+    top_issues: list[str] = Field(..., description="Top issues mentioned by users")
+    positive_aspects: list[str] = Field(..., description="Most praised aspects")
+    improvement_areas: list[str] = Field(..., description="Areas that need improvement")
+    trend: str = Field(..., description="Trend: improving, declining, stable")
+
+
+class PriorityIssue(BaseModel):
+    """High priority issue that requires attention."""
+    
+    issue: str = Field(..., description="Description of the issue")
+    frequency: int = Field(..., description="How many times this issue was mentioned")
+    severity: str = Field(..., description="Severity: low, medium, high, critical")
+    affected_users: int = Field(..., description="Number of users affected")
+    recommended_response: str = Field(..., description="Recommended response strategy")
+    department: str = Field(..., description="Which department should handle: product, support, pr, engineering")
+
+
+class ReputationAnalysisResponse(BaseModel):
+    """Response model for reputation analysis endpoint."""
+    
+    reviews: list[AppReview] = Field(..., description="List of analyzed reviews")
+    insights: list[ReputationInsight] = Field(..., description="AI insights for each review")
+    reputation_score: ReputationScore = Field(..., description="Overall reputation analysis")
+    priority_issues: list[PriorityIssue] = Field(..., description="High priority issues requiring action")
+    stats: ReviewStats = Field(..., description="Review statistics")
+    analyzed_at: str = Field(..., description="Timestamp when analysis was performed")
+    time_range_hours: int = Field(..., description="Time range in hours")

@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import './App.css'
 import ReviewCard from './components/ReviewCard'
 import StatsCard from './components/StatsCard'
 import FilterBar from './components/FilterBar'
 import Header from './components/Header'
+import ReputationAnalysis from './components/ReputationAnalysis'
 
 export interface Review {
   id: string
@@ -39,6 +40,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [filter, setFilter] = useState<'all' | 'google' | 'apple'>('all')
   const [sortBy, setSortBy] = useState<'date' | 'rating'>('date')
+  const [showAnalysis, setShowAnalysis] = useState(false)
 
   // Load real reviews from API
   const loadReviews = async () => {
@@ -116,12 +118,29 @@ function App() {
     loadReviews()
   }
 
+  const handleAnalysisComplete = (data: any) => {
+    console.log('Reputation analysis completed:', data)
+  }
+
   return (
     <div className="app">
       <Header onRefresh={handleRefresh} loading={loading} />
       
       <div className="container">
         <StatsCard stats={stats} />
+        
+        <div className="analysis-toggle">
+          <button 
+            className={`toggle-button ${showAnalysis ? 'active' : ''}`}
+            onClick={() => setShowAnalysis(!showAnalysis)}
+          >
+            {showAnalysis ? '📊 Приховати аналіз' : '🤖 Показати AI аналіз репутації'}
+          </button>
+        </div>
+
+        {showAnalysis && (
+          <ReputationAnalysis onAnalysisComplete={handleAnalysisComplete} />
+        )}
         
         <FilterBar
           filter={filter}

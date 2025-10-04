@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.config import settings
 from src.models import HealthResponse
-from src.routers import chat, reviews
+from src.routers import chat, reviews, reputation
 
 
 @asynccontextmanager
@@ -45,6 +45,7 @@ app.add_middleware(
 # Include routers
 app.include_router(chat.router)
 app.include_router(reviews.router)
+app.include_router(reputation.router)
 
 
 @app.get("/api/health", response_model=HealthResponse)
@@ -69,5 +70,7 @@ async def root():
             "reviews": "/api/reviews",
             "google_reviews": "/api/reviews/google",
             "apple_reviews": "/api/reviews/apple",
+            "reputation_analysis": "/api/reputation/analyze",
+            "reputation_summary": "/api/reputation/summary",
         },
     }
