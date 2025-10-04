@@ -68,6 +68,7 @@ class ReviewsResponse(BaseModel):
     stats: ReviewStats = Field(..., description="Review statistics")
     fetched_at: str = Field(..., description="Timestamp when reviews were fetched")
     time_range_hours: int = Field(..., description="Time range in hours")
+    cached: bool = Field(default=False, description="Whether data was served from cache")
 
 
 # AI Analysis Models
@@ -141,3 +142,4 @@ class ReputationAnalysisResponse(BaseModel):
     stats: ReviewStats = Field(..., description="Review statistics")
     analyzed_at: str = Field(..., description="Timestamp when analysis was performed")
     time_range_hours: int = Field(..., description="Time range in hours")
+    cached: bool = Field(default=False, description="Whether data was served from cache")
