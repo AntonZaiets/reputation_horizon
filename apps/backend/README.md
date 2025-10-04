@@ -1,201 +1,195 @@
-# Reputation Horizon - Backend (FastAPI)
+# Reputation Horizon Backend
 
-Python FastAPI backend для збору та обробки відгуків про додаток Preply з Google Play Store та Apple App Store.
+FastAPI backend service with LangGraph for AI-powered interactions.
 
-## Особливості
+## Features
 
-🚀 **FastAPI** - сучасний, швидкий веб-фреймворк
-📱 **Google Play Scraper** - збір відгуків з Google Play
-🍎 **App Store Scraper** - збір відгуків з App Store
-⏰ **Фільтрація за часом** - відгуки за останні N годин
-🌍 **Підтримка країн** - вибір країни для пошуку
-📊 **Статистика** - автоматичний підрахунок метрик
+- 🚀 **FastAPI**: Modern, fast web framework for building APIs
+- 🤖 **LangGraph**: Stateful AI agent with conversational capabilities
+- 📦 **uv**: Fast Python package manager
+- 🔧 **Multiple LLM Providers**: Support for OpenAI and Anthropic
+- ⚙️ **Best Practices**: Clean architecture, type hints, async/await
 
-## Встановлення
+## Architecture
 
-### 1. Створіть віртуальне середовище
-
-```bash
-cd apps/backend
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux/Mac
-source venv/bin/activate
+```
+src/
+├── main.py           # FastAPI application entry point
+├── config.py         # Configuration and settings
+├── models.py         # Pydantic models for validation
+├── graph.py          # LangGraph agent implementation
+└── routers/
+    └── chat.py       # Chat API endpoints
 ```
 
-### 2. Встановіть залежності
+## Prerequisites
 
+- Python 3.11+
+- [uv](https://github.com/astral-sh/uv) package manager
+
+Install uv if you haven't:
 ```bash
-pip install -r requirements.txt
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### 3. Налаштуйте змінні середовища (опціонально)
+## Setup
 
+1. **Install dependencies:**
+   ```bash
+   cd apps/backend
+   uv sync
+   ```
+
+2. **Configure environment:**
+   ```bash
+   cp env.example .env
+   # Edit .env and add your API keys
+   ```
+
+3. **Set your LLM API key:**
+   
+   For OpenAI:
+   ```bash
+   export OPENAI_API_KEY="your-key-here"
+   ```
+   
+   For Anthropic:
+   ```bash
+   export ANTHROPIC_API_KEY="your-key-here"
+   export LLM_PROVIDER="anthropic"
+   export LLM_MODEL="claude-3-5-sonnet-20241022"
+   ```
+
+## Running the Server
+
+### Development mode with auto-reload:
 ```bash
-cp .env.example .env
-# Відредагуйте .env за потреби
+uv run uvicorn src.main:app --reload --port 8000
 ```
 
-## Запуск
-
-### Development режим (з auto-reload)
-
+### Production mode:
 ```bash
-python main.py
+uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 ```
 
-або
-
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### Production режим
-
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
-```
-
-API буде доступне за адресою: **http://localhost:8000**
+The API will be available at:
+- Main API: http://localhost:8000
+- Interactive docs: http://localhost:8000/docs
+- Alternative docs: http://localhost:8000/redoc
 
 ## API Endpoints
 
-### 📋 Основні ендпоінти
-
-#### `GET /api/reviews`
-Отримати відгуки з обох магазинів за останні N годин
-
-**Параметри:**
-- `hours` (int, за замовчуванням: 24) - кількість годин назад
-- `country` (str, за замовчуванням: "us") - код країни
-- `limit` (int, за замовчуванням: 100) - макс. кількість відгуків
-
-**Приклад:**
+### Health Check
 ```bash
-curl "http://localhost:8000/api/reviews?hours=24&country=us&limit=50"
+curl http://localhost:8000/api/health
 ```
 
-#### `GET /api/reviews/google`
-Тільки Google Play відгуки
-
-#### `GET /api/reviews/apple`
-Тільки App Store відгуки
-
-### 📊 Формат відповіді
-
-```json
-{
-  "reviews": [
-    {
-      "id": "review_id",
-      "userName": "John Doe",
-      "rating": 5,
-      "text": "Great app!",
-      "date": "2025-10-04T10:30:00",
-      "source": "google",
-      "version": "7.45.0",
-      "thumbsUp": 12
-    }
-  ],
-  "stats": {
-    "totalReviews": 50,
-    "avgRating": 4.5,
-    "googlePlayReviews": 30,
-    "appStoreReviews": 20,
-    "positiveReviews": 40,
-    "negativeReviews": 5
-  }
-}
+### Chat with AI Agent
+```bash
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Hello! What can you help me with?"
+  }'
 ```
 
-## Підтримувані країни
+## LangGraph Architecture
 
-- 🇺🇸 `us` - США
-- 🇺🇦 `ua` - Україна
-- 🇬🇧 `gb` - Великобританія
-- 🇵🇱 `pl` - Польща
-- 🇩🇪 `de` - Німеччина
-- 🇫🇷 `fr` - Франція
-- 🇪🇸 `es` - Іспанія
-- 🇮🇹 `it` - Італія
-- ... та інші ISO 3166-1 alpha-2 коди
+The agent uses a simple but extensible graph structure:
 
-## Структура проекту
+1. **State Management**: Conversation history is maintained in the graph state
+2. **LLM Node**: Processes messages and generates responses
+3. **System Prompt**: Configurable context for the AI assistant
+4. **Async Operations**: Full async support for high performance
 
-```
-apps/backend/
-├── main.py                      # Головний файл FastAPI
-├── requirements.txt             # Python залежності
-├── .env.example                 # Приклад env змінних
-├── services/
-│   ├── __init__.py
-│   ├── google_play_service.py   # Сервіс Google Play
-│   ├── app_store_service.py     # Сервіс App Store
-│   └── review_aggregator.py     # Агрегація відгуків
-└── README.md
-```
+### Extending the Agent
 
-## Документація API
+You can easily extend the graph in `src/graph.py`:
 
-Після запуску сервера документація доступна за адресою:
+- Add tool/function calling nodes
+- Implement multi-step reasoning
+- Add memory/retrieval nodes
+- Include conditional routing logic
 
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-
-## Приклади використання
-
-### Python
-
+Example with tools:
 ```python
-import httpx
+from langgraph.prebuilt import ToolNode
 
-async with httpx.AsyncClient() as client:
-    response = await client.get(
-        "http://localhost:8000/api/reviews",
-        params={"hours": 24, "country": "ua", "limit": 50}
-    )
-    data = response.json()
-    print(f"Total reviews: {data['stats']['totalReviews']}")
+# Define your tools
+tools = [your_tool_1, your_tool_2]
+
+# Add tool node
+workflow.add_node("tools", ToolNode(tools))
+
+# Update routing logic
+def should_continue(state):
+    if needs_tools(state):
+        return "tools"
+    return END
 ```
 
-### JavaScript (для фронтенду)
+## Configuration
 
-```javascript
-const response = await fetch('http://localhost:8000/api/reviews?hours=24&country=us');
-const data = await response.json();
-console.log(data.stats);
+All configuration is managed through environment variables (see `.env.example`):
+
+- `PORT`: Server port (default: 8000)
+- `LLM_PROVIDER`: Choose "openai" or "anthropic"
+- `LLM_MODEL`: Model name (e.g., "gpt-4o-mini", "claude-3-5-sonnet-20241022")
+- `LLM_TEMPERATURE`: Response randomness (0.0 to 1.0)
+
+## Development
+
+### Code formatting and linting:
+```bash
+uv run ruff check .
+uv run ruff format .
+```
+
+### Run tests:
+```bash
+uv run pytest
+```
+
+## Production Deployment
+
+For production, consider:
+
+1. Use environment-specific `.env` files
+2. Configure CORS properly in `main.py`
+3. Add authentication/authorization
+4. Implement conversation persistence (database)
+5. Add rate limiting
+6. Use a production ASGI server like Gunicorn with Uvicorn workers
+
+Example production command:
+```bash
+uv run gunicorn src.main:app \
+  --workers 4 \
+  --worker-class uvicorn.workers.UvicornWorker \
+  --bind 0.0.0.0:8000
 ```
 
 ## Troubleshooting
 
-### Проблема: Не знаходить відгуки
+**Issue**: `OPENAI_API_KEY not set`
+- Make sure your `.env` file exists (copy from `env.example`)
+- Add your API key to the `.env` file
+- Or export it as an environment variable
 
-**Рішення:**
-- Збільште параметр `hours` (наприклад, до 168 для тижня)
-- Перевірте правильність коду країни
-- Спробуйте інший `limit` (100-200)
+**Issue**: Package conflicts
+```bash
+uv lock --upgrade
+uv sync
+```
 
-### Проблема: Повільна відповідь
+**Issue**: Module not found
+```bash
+# Make sure you're running from the backend directory
+cd apps/backend
+uv run uvicorn src.main:app --reload
+```
 
-**Рішення:**
-- Зменште `limit`
-- Використовуйте кешування (можна додати Redis)
-- Запускайте в production режимі з workers
+## License
 
-## Майбутні покращення
-
-- [ ] Кешування відгуків (Redis)
-- [ ] Періодичне оновлення в фоні (Celery)
-- [ ] База даних для зберігання історії
-- [ ] Сентимент-аналіз відгуків
-- [ ] Webhooks для нових відгуків
-- [ ] Rate limiting
-- [ ] Аутентифікація API
-
-## Ліцензія
-
-MIT
+Part of the Reputation Horizon project.
 
