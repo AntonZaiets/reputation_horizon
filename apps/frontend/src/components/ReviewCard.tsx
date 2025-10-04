@@ -23,9 +23,6 @@ const ReviewCard = memo(function ReviewCard({ review }: ReviewCardProps) {
     <article className={`review-card ${review.source}`} role="article" aria-labelledby={`review-${review.id}`}>
       <header className="review-header">
         <div className="review-user">
-          <div className="user-avatar" aria-hidden="true">
-            {(review.userName || 'A').charAt(0).toUpperCase()}
-          </div>
           <div className="user-info">
             <h3 className="user-name" id={`review-${review.id}`}>
               {review.userName || 'Anonymous'}

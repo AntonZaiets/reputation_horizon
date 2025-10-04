@@ -17,7 +17,7 @@
 
 .analysis-header h2 {
   margin: 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 24px;
   font-weight: 700;
 }
@@ -26,7 +26,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
   font-size: 14px;
 }
 
@@ -61,13 +61,13 @@
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
   border-bottom: 2px solid transparent;
   transition: all 0.2s;
 }
 
 .tab:hover {
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
   background: #f9fafb;
 }
 
@@ -142,7 +142,7 @@
 
 .sentiment-distribution h3 {
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 18px;
   font-weight: 600;
 }
@@ -170,7 +170,7 @@
 }
 
 .sentiment-label.neutral {
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
 }
 
 .sentiment-label.negative {
@@ -206,7 +206,7 @@
   min-width: 30px;
   text-align: right;
   font-weight: 600;
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
 }
 
 .top-issues, .positive-aspects {
@@ -217,7 +217,7 @@
 
 .top-issues h3, .positive-aspects h3 {
   margin: 0 0 16px 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 18px;
   font-weight: 600;
 }
@@ -248,7 +248,7 @@
 }
 
 .issue-text {
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
   font-size: 14px;
 }
 
@@ -270,7 +270,7 @@
 /* Insights Tab */
 .insights-tab h3 {
   margin: 0 0 20px 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 20px;
   font-weight: 600;
 }
@@ -302,7 +302,7 @@
 
 .review-id {
   font-weight: 600;
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
   font-size: 14px;
 }
 
@@ -336,12 +336,12 @@
 
 .confidence {
   font-size: 12px;
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
 }
 
 .intent-info, .topics-info, .recommended-action {
   font-size: 14px;
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
 }
 
 .action-required {
@@ -357,7 +357,7 @@
 /* Issues Tab */
 .issues-tab h3 {
   margin: 0 0 20px 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 20px;
   font-weight: 600;
 }
@@ -393,7 +393,7 @@
 
 .issue-header h4 {
   margin: 0;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 18px;
   font-weight: 600;
 }
@@ -421,13 +421,13 @@
 
 .stat-label {
   font-size: 12px;
-  color: #6b7280;
+  color: #334155;  /* Darker text for better contrast */
   font-weight: 500;
 }
 
 .stat-value {
   font-size: 16px;
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-weight: 600;
 }
 
@@ -439,13 +439,13 @@
 }
 
 .issue-recommendation strong {
-  color: #1f2937;
+  color: #0f172a;  /* Darker text for better contrast */
   font-size: 14px;
 }
 
 .issue-recommendation p {
   margin: 8px 0 0 0;
-  color: #374151;
+  color: #1e293b;  /* Darker text for better contrast */
   font-size: 14px;
   line-height: 1.5;
 }

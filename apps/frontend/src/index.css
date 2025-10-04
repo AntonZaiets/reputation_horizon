@@ -86,9 +86,9 @@
   --color-background: #ffffff;
   --color-surface: #f9fafb;
   --color-surface-elevated: #ffffff;
-  --color-text-primary: var(--color-neutral-900);
-  --color-text-secondary: var(--color-neutral-600);
-  --color-text-tertiary: var(--color-neutral-500);
+  --color-text-primary: #0f172a;  /* Darker primary text */
+  --color-text-secondary: #1e293b;  /* Darker secondary text */
+  --color-text-tertiary: #334155;  /* Darker tertiary text */
   --color-border: var(--color-neutral-200);
   --color-border-strong: var(--color-neutral-300);
 
